@@ -14,8 +14,8 @@ public class HuyTestMain extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            //String fxmlName = "MainMenu.fxml";
-            String fxmlName = "WinScreen.fxml";
+            String fxmlName = "MainMenu.fxml";
+            //String fxmlName = "WinScreen.fxml";
             //String fxmlName = "GameOver.fxml";
             //String fxmlName = "StoryDialog.fxml";
             //String fxmlName = "GameUI.fxml"

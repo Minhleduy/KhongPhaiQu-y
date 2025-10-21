@@ -1,5 +1,6 @@
 package Arkanoid.ui;
 
+import Arkanoid.util.AnimationHelper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
