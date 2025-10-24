@@ -1,4 +1,4 @@
-package gameobject;
+package gameobject.items;
 
 import gameobject.core.PowerUp;
 import gameobject.dynamic.Ball;

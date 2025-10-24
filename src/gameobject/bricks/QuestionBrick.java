@@ -1,9 +1,8 @@
 package gameobject.bricks;
 
-import gameobject.DoubleBallItem;
-import gameobject.ExpandPaddleItem;
-import gameobject.HeartItem;
-import gameobject.StrongBallItem;
+import gameobject.items.DoubleBallItem;
+import gameobject.items.ExpandPaddleItem;  // SỬA THÀNH items.ExpandPaddleItem
+import gameobject.items.HeartItem;
 import gameobject.core.Brick;
 import gameobject.dynamic.Paddle;
 import javafx.scene.layout.Pane;
@@ -15,12 +14,11 @@ import java.util.Random;
 public class QuestionBrick extends Brick {
 
     private final Random random = new Random();
-    private Paddle paddle; // THÊM: reference đến paddle
+    private Paddle paddle;
 
-    // SỬA CONSTRUCTOR - THÊM PADDLE
     public QuestionBrick(double x, double y, Pane gamePane, Paddle paddle) {
         super(x, y, 50, 20, 1, "/resources/images/bricks/Brick7.png", gamePane);
-        this.paddle = paddle; // LƯU PADDLE
+        this.paddle = paddle;
     }
 
     @Override
@@ -39,13 +37,13 @@ public class QuestionBrick extends Brick {
 
         switch (type) {
             case 0:
-                new DoubleBallItem(gamePane, paddle, itemX, itemY); // TRUYỀN PADDLE
+                new DoubleBallItem(gamePane, paddle, itemX, itemY);
                 break;
             case 1:
-                new ExpandPaddleItem(gamePane, paddle, itemX, itemY); // TRUYỀN PADDLE
+                new ExpandPaddleItem(gamePane, paddle, itemX, itemY);  // GIỜ ĐÚNG PACKAGE
                 break;
             case 2:
-                new HeartItem(gamePane, paddle, itemX, itemY); // TRUYỀN PADDLE
+                new HeartItem(gamePane, paddle, itemX, itemY);
                 break;
         }
     }

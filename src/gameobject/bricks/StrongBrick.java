@@ -1,6 +1,6 @@
 package gameobject.bricks;
 
-import gameobject.StrongBallItem;
+import gameobject.items.StrongBallItem;
 import gameobject.core.Brick;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;

@@ -1,4 +1,4 @@
-package gameobject;
+package gameobject.items;
 
 import application.GameManager; // <-- Import GameManager
 import gameobject.core.GameObject;
