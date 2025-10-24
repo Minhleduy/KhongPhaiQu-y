@@ -29,4 +29,8 @@ public class UnbreakableBrick extends Brick {
     public boolean isUnbreakable() { //ham dinh danh loai gach (da them vao trong Brick)
         return true;
     }
+    public boolean isBreakable() {
+        // Gạch không thể phá hủy sẽ luôn trả về false
+        return false;
+    }
 }

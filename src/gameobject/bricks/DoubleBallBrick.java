@@ -1,6 +1,6 @@
 package gameobject.bricks;
 
-import gameobject.DoubleBallItem;
+import gameobject.items.DoubleBallItem;
 import gameobject.core.Brick;
 import gameobject.dynamic.Paddle;
 import javafx.scene.layout.Pane;

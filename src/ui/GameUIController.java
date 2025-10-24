@@ -63,14 +63,14 @@ public class GameUIController {
             levelLabel.setVisible(false);
 
             Boss boss = gameManager.getBoss();
-            if (boss != null && bossisAlive()) {
+            if (boss != null && boss.isAlive()) {
                 updateBossHealth(boss.getHealth(), boss.getMaxHealth());
             }
         }
         else if (currentState == GameState.PLAYING) {
             setBossUIVisible(false);
             levelLabel.setVisible(true);
-            updateLevel(LevelManager.getInstance().getCurrentLevelNumber());
+            updateLevel(LevelManager.getInstance().getCurrentLevel());
         }
     }
 

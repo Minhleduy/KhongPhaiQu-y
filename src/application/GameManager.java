@@ -126,8 +126,14 @@ public class GameManager {
         this.boss = new Boss(gameRoot, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
         addGameObject(this.boss);
 
-        addGameObject(new Paddle());
-        addGameObject(new Ball());
+        double paddleStartX = (Config.SCREEN_WIDTH - Config.PADDLE_WIDTH) / 2.0;
+        double paddleStartY = Config.PADDLE_Y_POSITION;
+
+        double ballStartX = Config.SCREEN_WIDTH / 2.0;
+        double ballStartY = Config.SCREEN_HEIGHT / 2.0;
+
+        addGameObject(new Paddle(gameRoot, paddleStartX, paddleStartY, Config.SCREEN_WIDTH));
+        addGameObject(new Ball(gameRoot, ballStartX, ballStartY, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT));
     }
 
     public void addGameObject(GameObject obj) {
@@ -143,9 +149,10 @@ public class GameManager {
         return this.gameObjects;
     }
 
-    public GameState getCurrentState() {
-        return currentState;
+    public GameState getGameState() {
+        return this.currentState;
     }
+
     public void setCurrentState(GameState state) {
         this.currentState = state;
     }
@@ -160,5 +167,11 @@ public class GameManager {
     }
     public void setGameRoot(Pane root) {
         this.gameRoot = root;
+    }
+    public Boss getBoss() {
+        return this.boss;
+    }
+    public Pane getGameRoot() {
+        return this.gameRoot;
     }
 }

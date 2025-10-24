@@ -62,7 +62,9 @@ public abstract class Brick extends GameObject {
         return false;
     } //dinh danh xem co phai gach pha duoc ko
 
-
+    public boolean isBreakable() {
+        return true;
+    }
 
     public void update() {
         // Gạch không di chuyển
