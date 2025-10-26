@@ -10,7 +10,7 @@ import javafx.scene.layout.Pane;
  */
 public abstract class PowerUp extends MovableObject {
     protected Pane gameRoot;
-    protected Paddle paddle;         // reference trực tiếp đến paddle
+    protected Paddle paddle;
     protected boolean active = true;
     private AnimationTimer fallTimer;
 
@@ -19,7 +19,6 @@ public abstract class PowerUp extends MovableObject {
         this.gameRoot = gameRoot;
         this.paddle = paddle;
 
-        // Tạo ảnh item - GIỮ NGUYÊN logic từ code cũ
         Image image = new Image(getClass().getResourceAsStream(imagePath));
         imageView = new ImageView(image);
         imageView.setLayoutX(x);

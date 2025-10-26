@@ -1,6 +1,6 @@
 package gameobject.bricks;
 
-import gameobject.HeartItem;
+import gameobject.items.HeartItem;
 import gameobject.core.Brick;
 import gameobject.dynamic.Paddle;
 import javafx.scene.layout.Pane;

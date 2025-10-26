@@ -70,7 +70,7 @@ public class GameUIController {
         else if (currentState == GameState.PLAYING) {
             setBossUIVisible(false);
             levelLabel.setVisible(true);
-            updateLevel(LevelManager.getInstance().getCurrentLevelNumber());
+            updateLevel(LevelManager.getInstance().getCurrentLevel());
         }
     }
 

@@ -1,32 +1,35 @@
 package gameobject.dynamic;
 
+import gameobject.core.MovableObject;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
-public class Paddle {
+public class Paddle extends MovableObject {
     private ImageView imageView;
-    private double x, y;
-    private double width, height;
     private final double MOVE_SPEED = 8;
     private double sceneWidth;
     private int lives = 3;
 
+    // SỬA CONSTRUCTOR - gọi super()
     public Paddle(Pane gameRoot, double startX, double startY, double sceneWidth) {
-        this.x = startX;
-        this.y = startY;
+        // GỌI SUPER() VỚI ĐÚNG THAM SỐ
+        super(startX, startY, 0, 0, null); // Tạm thời width=0, height=0, image=null
+
         this.sceneWidth = sceneWidth;
 
         // Load ảnh paddle
         Image image = new Image(getClass().getResourceAsStream("/resources/images/paddle/paddle1.png"));
         imageView = new ImageView(image);
-        width = image.getWidth();
-        height = image.getHeight();
+
+        // Cập nhật width, height từ ảnh thực tế
+        setWidth(image.getWidth());
+        setHeight(image.getHeight());
 
         // Đặt vị trí ban đầu
-        imageView.setLayoutX(x);
-        imageView.setLayoutY(y);
+        imageView.setLayoutX(startX);
+        imageView.setLayoutY(startY);
 
         // Thêm paddle vào Pane
         gameRoot.getChildren().add(imageView);
@@ -34,6 +37,7 @@ public class Paddle {
         // Gắn sự kiện di chuột
         enableMouseControl(gameRoot);
     }
+
     public int getLives() {
         return lives;
     }
@@ -53,61 +57,69 @@ public class Paddle {
         return imageView;
     }
 
+    // SỬA: Dùng getter từ GameObject
     public double getX() {
-        return x;
+        return super.getX();
     }
     public double getY() {
-        return y;
+        return super.getY();
     }
     public double getWidth() {
-        return width;
+        return super.getWidth();
     }
     public double getHeight() {
-        return height;
+        return super.getHeight();
     }
 
+    // SỬA: Ghi đè setter để cập nhật cả ImageView
+    @Override
     public void setWidth(double width) {
-        this.width = width;
+        super.setWidth(width);
         imageView.setFitWidth(width);
     }
 
+    @Override
     public void setX(double x) {
-        this.x = x;
+        super.setX(x);
         updatePosition();
     }
 
+    @Override
     public void setY(double y) {
-        this.y = y;
+        super.setY(y);
         updatePosition();
     }
 
     // --- Di chuyển bằng phím ---
     public void moveLeft() {
-        x -= MOVE_SPEED;
-        if (x < 0) x = 0;
-        updatePosition();
+        setX(getX() - MOVE_SPEED);
+        if (getX() < 0) setX(0);
     }
 
     public void moveRight() {
-        x += MOVE_SPEED;
-        if (x + width > sceneWidth) x = sceneWidth - width;
-        updatePosition();
+        setX(getX() + MOVE_SPEED);
+        if (getX() + getWidth() > sceneWidth) setX(sceneWidth - getWidth());
     }
 
     // --- Cập nhật vị trí ImageView ---
     private void updatePosition() {
-        imageView.setLayoutX(x);
-        imageView.setLayoutY(y);
+        imageView.setLayoutX(getX());
+        imageView.setLayoutY(getY());
     }
 
     // --- Di chuyển theo chuột ---
     private void enableMouseControl(Pane gameRoot) {
         gameRoot.setOnMouseMoved((MouseEvent e) -> {
-            double mouseX = e.getX() - width / 2;
+            double mouseX = e.getX() - getWidth() / 2;
             if (mouseX < 0) mouseX = 0;
-            if (mouseX + width > sceneWidth) mouseX = sceneWidth - width;
-            x = mouseX;
-            updatePosition();
+            if (mouseX + getWidth() > sceneWidth) mouseX = sceneWidth - getWidth();
+            setX(mouseX);
         });
+    }
+
+    // SỬA: Thêm update method nếu cần
+    @Override
+    public void update(double deltaTime) {
+        // Paddle di chuyển theo input, không cần update tự động
     }
 }

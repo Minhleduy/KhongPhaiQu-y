@@ -51,4 +51,9 @@ public class SceneManager {
         System.out.println("Chuyển sang màn hình Game Over. Điểm cuối cùng: " + finalScore);
         switchScene("GameOver.fxml");
     }
+
+    public void showWinScreen() {
+        System.out.println("Đang chuyển sang màn hình chiến thắng...");
+        switchScene("WinScreen.fxml");
+    }
 }

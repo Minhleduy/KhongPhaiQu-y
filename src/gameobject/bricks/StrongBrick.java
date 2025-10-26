@@ -1,30 +1,34 @@
 package gameobject.bricks;
 
-import gameobject.StrongBallItem;
+import gameobject.items.StrongBallItem;
 import gameobject.core.Brick;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
+import gameobject.dynamic.Paddle;
 
 
 public class StrongBrick extends Brick {
 
-    public StrongBrick(double x, double y, Pane gamePane) {
-        // hitPoints = 1, chỉ dùng 1 ảnh duy nhất
+    // THÊM 1: Thêm biến để lưu lại Paddle
+    private Paddle paddle;
+
+    // THÊM 2: Nhận Paddle trong hàm khởi tạo
+    public StrongBrick(double x, double y, Pane gamePane, Paddle paddle) {
         super(x, y, 40, 20, 1, "resources/images/brick/Brick3.png", gamePane);
+
+        // Lưu lại paddle để dùng sau
+        this.paddle = paddle;
     }
 
     @Override
     public void hit(Pane gamePane) {
-        // Trừ máu (từ 1 xuống 0)
         this.hitPoints--;
 
-        // Nếu hết máu
         if (this.hitPoints <= 0) {
-            // Phá hủy viên gạch
             destroy(gamePane);
 
-            // Chỉ cần dòng này là đủ. Item sẽ tự thêm vào màn hình và tự rơi.
-            new StrongBallItem(getX(), getY(), gamePane);
+            // THÊM 3: Truyền "this.paddle" khi tạo ra item
+            new StrongBallItem(gamePane, this.paddle, getX(), getY());
         }
     }
 }

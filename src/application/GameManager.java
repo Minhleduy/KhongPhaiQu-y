@@ -14,6 +14,7 @@ public class GameManager {
     private static GameManager instance;
     private Boss boss;
     private Pane gameRoot;
+    final double deltaTime = 1.0;
 
     public enum GameState {
         MENU, PLAYING, PAUSED, GAME_OVER, LEVEL_TRANSITION, BOSS_FIGHT
@@ -45,17 +46,20 @@ public class GameManager {
 
     public void update() {
         if (currentState == GameState.PLAYING) {
-            new ArrayList<>(gameObjects).forEach(GameObject::update);
+
+            for (GameObject obj : new ArrayList<>(gameObjects)) {
+                obj.update(deltaTime);
+            }
 
             if (isLevelComplete()) {
                 LevelManager.getInstance().progressToNextStage();
             }
         }
         else if (currentState == GameState.BOSS_FIGHT) {
-            // Cập nhật tất cả các đối tượng (boss, bóng, thanh đỡ)
-            new ArrayList<>(gameObjects).forEach(GameObject::update);
+            for (GameObject obj : new ArrayList<>(gameObjects)) {
+                obj.update(deltaTime);
+            }
 
-            // Tìm quả bóng và kiểm tra va chạm với boss
             Ball ball = findBall();
             if (ball != null && boss != null && boss.isAlive()) {
                 if (boss.checkBallCollision(ball)) {
@@ -64,7 +68,6 @@ public class GameManager {
                 }
             }
 
-            //Kiểm tra xem boss đã bị đánh bại chưa
             if (boss != null && !boss.isAlive()) {
                 setCurrentState(GameState.GAME_OVER);
                 SceneManager.getInstance().showWinScreen();
@@ -72,10 +75,6 @@ public class GameManager {
         }
     }
 
-    public void showWinScreen() {
-        System.out.println("Winner");
-        switchScene("WinScreen.fxml");
-    }
 
     /**
      * Phương thức trợ giúp để tìm đối tượng Ball trong danh sách gameObjects.
@@ -127,8 +126,14 @@ public class GameManager {
         this.boss = new Boss(gameRoot, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
         addGameObject(this.boss);
 
-        addGameObject(new Paddle());
-        addGameObject(new Ball());
+        double paddleStartX = (Config.SCREEN_WIDTH - Config.PADDLE_WIDTH) / 2.0;
+        double paddleStartY = Config.PADDLE_Y_POSITION;
+
+        double ballStartX = Config.SCREEN_WIDTH / 2.0;
+        double ballStartY = Config.SCREEN_HEIGHT / 2.0;
+
+        addGameObject(new Paddle(gameRoot, paddleStartX, paddleStartY, Config.SCREEN_WIDTH));
+        addGameObject(new Ball(gameRoot, ballStartX, ballStartY, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT));
     }
 
     public void addGameObject(GameObject obj) {
@@ -144,9 +149,10 @@ public class GameManager {
         return this.gameObjects;
     }
 
-    public GameState getCurrentState() {
-        return currentState;
+    public GameState getGameState() {
+        return this.currentState;
     }
+
     public void setCurrentState(GameState state) {
         this.currentState = state;
     }
@@ -161,5 +167,11 @@ public class GameManager {
     }
     public void setGameRoot(Pane root) {
         this.gameRoot = root;
+    }
+    public Boss getBoss() {
+        return this.boss;
+    }
+    public Pane getGameRoot() {
+        return this.gameRoot;
     }
 }

@@ -197,10 +197,18 @@ public class Boss extends MovableObject {
     }
 
     // ======== GETTERS ========
-    public int getHealth() { return health; }
-    public int getMaxHealth() { return maxHealth; }
-    public boolean isAlive() { return isAlive; }
-    public ImageView getImageView() { return imageView; }
+    public int getHealth() {
+        return health;
+    }
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+    public boolean isAlive() {
+        return isAlive;
+    }
+    public ImageView getImageView() {
+        return imageView;
+    }
 
 
     public boolean checkBallCollision(Ball ball) {

@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import application.SceneManager;
 
 public class MainMenuController {
 
@@ -17,6 +18,7 @@ public class MainMenuController {
     @FXML
     void handleStartButtonAction(ActionEvent event) {
         System.out.println("Nút Bắt Đầu đã được nhấn!");
+        SceneManager.getInstance().showGameScene();
     }
 
     @FXML
