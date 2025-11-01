@@ -15,7 +15,7 @@ public class ExpandPaddleItem extends PowerUp {
     private static final double DURATION = 5;
 
     public ExpandPaddleItem(Pane gameRoot, Paddle paddle, double x, double y) {
-        super(gameRoot, paddle, x, y, "/resources/images/items/Item3.png");
+        super(gameRoot, paddle, x, y, "/images/items/Item3.png");
     }
 
     @Override

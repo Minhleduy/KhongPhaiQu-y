@@ -12,7 +12,7 @@ public class DoubleBallItem extends PowerUp {
 
     // SỬA: ĐÚNG CONSTRUCTOR - CẦN PADDLE
     public DoubleBallItem(Pane gameRoot, Paddle paddle, double x, double y) {
-        super(gameRoot, paddle, x, y, "/resources/images/items/Item4.png");
+        super(gameRoot, paddle, x, y, "/images/items/Item4.png");
     }
 
     @Override

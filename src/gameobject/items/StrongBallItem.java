@@ -11,7 +11,7 @@ public class StrongBallItem extends PowerUp {
 
     public StrongBallItem(Pane gamePane, Paddle paddle, double x, double y) {
 
-        super(gamePane, paddle, x, y, "/resources/images/items/Item1.png");
+        super(gamePane, paddle, x, y, "/images/items/Item1.png");
     }
 
     /**

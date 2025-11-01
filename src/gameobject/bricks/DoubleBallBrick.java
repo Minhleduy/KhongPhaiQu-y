@@ -13,7 +13,7 @@ public class DoubleBallBrick extends Brick {
     private Paddle paddle;
 
     public DoubleBallBrick(double x, double y, Pane gamePane, Paddle paddle) {
-        super(x, y, 50, 20, 1, "/resources/images/bricks/Brick2.png", gamePane);
+        super(x, y, 50, 20, 1, "/images/brick/Brick2.png", gamePane);
         this.paddle = paddle;
     }
 

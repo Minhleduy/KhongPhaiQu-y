@@ -20,7 +20,7 @@ public class Paddle extends MovableObject {
         this.sceneWidth = sceneWidth;
 
         // Load ảnh paddle
-        Image image = new Image(getClass().getResourceAsStream("/resources/images/paddle/paddle1.png"));
+        Image image = new Image(getClass().getResourceAsStream("/images/paddle/paddle1.png"));
         imageView = new ImageView(image);
 
         // Cập nhật width, height từ ảnh thực tế

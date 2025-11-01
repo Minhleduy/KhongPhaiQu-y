@@ -31,7 +31,7 @@ public class LevelManager {
     public void loadLevel(int levelNumber) {
         this.currentLevel = levelNumber;
         GameManager gm = GameManager.getInstance();
-        Pane gameRoot = gm.getGameRoot();
+        Pane gameRoot = gm.getGamePane();
 
         gm.clearGameObjects();
 

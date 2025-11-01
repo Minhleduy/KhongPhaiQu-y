@@ -17,7 +17,7 @@ public class QuestionBrick extends Brick {
     private Paddle paddle;
 
     public QuestionBrick(double x, double y, Pane gamePane, Paddle paddle) {
-        super(x, y, 50, 20, 1, "/resources/images/bricks/Brick7.png", gamePane);
+        super(x, y, 50, 20, 1, "/images/brick/Brick7.png", gamePane);
         this.paddle = paddle;
     }
 

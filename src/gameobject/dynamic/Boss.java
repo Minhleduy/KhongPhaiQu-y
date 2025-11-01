@@ -27,7 +27,7 @@ public class Boss extends MovableObject {
 
     public Boss(Pane gameRoot, double sceneWidth, double sceneHeight) {
         super(sceneWidth / 2 - 75, 50, 150, 80,
-                new Image(Boss.class.getResourceAsStream("/resources/images/npc/Boss.png")));
+                new Image(Boss.class.getResourceAsStream("/images/npc/Boss.png")));
         this.gameRoot = gameRoot;
         this.random = new Random();
         this.maxHealth = 10; // Boss có 10 máu

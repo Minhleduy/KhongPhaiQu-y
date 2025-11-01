@@ -11,7 +11,7 @@ public class BlockBrick extends Brick {
     private Paddle paddle;
 
     public BlockBrick(double x, double y, Pane gamePane, Paddle paddle) {
-        super(x, y, 50, 20, 1, "/resources/images/bricks/block_brick.png", gamePane);
+        super(x, y, 50, 20, 1, "/images/brick/Brick6.png", gamePane);
         this.paddle = paddle;
     }
 

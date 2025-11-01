@@ -1,6 +1,7 @@
 package Arkanoid.ui;
 
 import Arkanoid.util.AnimationHelper;
+import application.GameManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +19,7 @@ public class MainMenuController {
     @FXML
     void handleStartButtonAction(ActionEvent event) {
         System.out.println("Nút Bắt Đầu đã được nhấn!");
-        SceneManager.getInstance().showGameScene();
+        GameManager.getInstance().startGame();
     }
 
     @FXML

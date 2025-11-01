@@ -14,7 +14,7 @@ public class HeartBrick extends Brick {
 
 
     public HeartBrick(double x, double y, Pane gamePane, Paddle paddle) {
-        super(x, y, 50, 20, 1, "/resources/images/bricks/Brick8.png", gamePane);
+        super(x, y, 50, 20, 1, "/images/brick/Brick8.png", gamePane);
         this.paddle = paddle;
 
 

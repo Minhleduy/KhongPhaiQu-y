@@ -11,7 +11,7 @@ public class BlockItem extends PowerUp {
     private static boolean shieldActive = false; // Trạng thái bảo vệ
 
     public BlockItem(Pane gameRoot, Paddle paddle, double x, double y) {
-        super(gameRoot, paddle, x, y, "/resources/images/items/Item6.png");
+        super(gameRoot, paddle, x, y, "/images/items/Item6.png");
     }
 
     @Override

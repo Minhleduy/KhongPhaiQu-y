@@ -25,6 +25,7 @@ public class BackgroundManager {
     public BackgroundManager(Region gamePane) {
         this.gamePane = gamePane;
         this.backgroundImages = new HashMap<>();
+        System.out.println("BackgroundManager: Đã khởi tạo. gamePane là: " + this.gamePane);
         preloadBackgrounds();
     }
 
@@ -37,7 +38,8 @@ public class BackgroundManager {
         backgroundImages.put(3, new Image(getClass().getResourceAsStream("/images/background/Background3.png")));
         backgroundImages.put(4, new Image(getClass().getResourceAsStream("/images/background/Background4.png")));
         //ảnh nền cho Boss
-        // backgroundImages.put(5, new Image(getClass().getResourceAsStream("/images/npc/Boss.png")));
+        System.out.println("BackgroundManager: Đã tải " + backgroundImages.size() + " ảnh nền.");
+        backgroundImages.put(5, new Image(getClass().getResourceAsStream("/images/npc/Boss.png")));
     }
 
     /**
@@ -46,7 +48,7 @@ public class BackgroundManager {
      */
     public void setBackgroundForLevel(int level) {
         Image bgImage = backgroundImages.get(level);
-
+        System.out.println("BackgroundManager: Được gọi setBackground. gamePane là: " + this.gamePane + ", ảnh là: " + bgImage);
         if (bgImage != null) {
             BackgroundImage backgroundImage = new BackgroundImage(
                     bgImage,
@@ -57,6 +59,7 @@ public class BackgroundManager {
             );
 
             gamePane.setBackground(new javafx.scene.layout.Background(backgroundImage));
+            System.out.println("BackgroundManager: ĐÃ THỰC HIỆN SET BACKGROUND!");
         } else {
             System.err.println("Không tìm thấy ảnh nền cho Level " + level);
         }

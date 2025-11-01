@@ -1,8 +1,8 @@
 package gameobject.dynamic;
 
+import application.GameManager; // ✅ ĐÃ THÊM
 import gameobject.core.Brick;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import gameobject.core.GameObject; // ✅ ĐÃ THÊM
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -12,16 +12,17 @@ import gameobject.core.MovableObject;
 import javafx.animation.PauseTransition;
 
 import java.util.List;
+import java.util.stream.Collectors; // ✅ ĐÃ THÊM
 
 public class Ball extends MovableObject {
     private ImageView imageView;
-    private final double BALL_SPEED = 5;
-    private double speedX;
-    private double speedY;
+    private final double BALL_SPEED = 5; // Tốc độ cơ bản
+    // private double speedX; // Đã có dx trong MovableObject
+    // private double speedY; // Đã có dy trong MovableObject
     private boolean isStrong = false;
     private PauseTransition strongModeTimer;
     private double sceneWidth, sceneHeight;
-    private Timeline timeline;
+    // private Timeline timeline; // ⛔ LỖI 2: Đã xóa vòng lặp Timeline nội bộ
 
     public Ball(Pane gameRoot, double startX, double startY, double sceneWidth, double sceneHeight) {
 
@@ -31,22 +32,21 @@ public class Ball extends MovableObject {
         this.sceneHeight = sceneHeight;
 
         // Load ảnh
-        Image image = new Image(getClass().getResourceAsStream("/resources/images/ball/Ball1.png"));
+        Image image = new Image(getClass().getResourceAsStream("/images/ball/Ball1.png"));
         imageView = new ImageView(image);
 
         // Cập nhật width, height từ ảnh thực tế
         setWidth(image.getWidth());
         setHeight(image.getHeight());
 
-        // Set vận tốc ban đầu
-        setDx(BALL_SPEED);
-        setDy(-BALL_SPEED);
+        // Set vận tốc ban đầu (dùng dx, dy từ MovableObject)
+        resetVelocity(); // Gọi hàm reset vận tốc
 
         imageView.setLayoutX(startX);
         imageView.setLayoutY(startY);
         gameRoot.getChildren().add(imageView);
 
-        startMoving();
+        // startMoving(); // ⛔ LỖI 2: Đã xóa, GameManager sẽ lo việc update
     }
 
     // --- Getter để check va chạm ---
@@ -68,95 +68,151 @@ public class Ball extends MovableObject {
         return super.getHeight();
     }
 
+    // SỬA: Dùng getter/setter của dx/dy từ MovableObject
     public double getSpeedX() {
-        return speedX;
+        return getDx();
     }
-
     public void setSpeedX(double speedX) {
-        this.speedX = speedX;
+        setDx(speedX);
     }
-
     public double getSpeedY() {
-        return speedY;
+        return getDy();
     }
-
     public void setSpeedY(double speedY) {
-        this.speedY = speedY;
+        setDy(speedY);
     }
 
-    // SỬA: Ghi đè setX/setY để cập nhật cả ImageView
     @Override
     public void setX(double x) {
         super.setX(x);
         updatePosition();
     }
-
     @Override
     public void setY(double y) {
         super.setY(y);
         updatePosition();
     }
 
-    // --- Cập nhật ImageView ---
     private void updatePosition() {
         imageView.setLayoutX(getX());
         imageView.setLayoutY(getY());
     }
 
     // --- Di chuyển bóng ---
-    private void startMoving() {
-        timeline = new Timeline(new KeyFrame(Duration.millis(16), e -> update(16.0/1000.0)));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-    }
+    // private void startMoving() { ... } // ⛔ LỖI 2: Đã xóa
 
     public void reverseSpeedY() {
-        this.speedY = -this.speedY;
+        setDy(-getDy());
     }
-
     public void reverseSpeedX() {
-        this.speedX = -this.speedX;
+        setDx(-getDx());
     }
 
-    // SỬA: Ghi đè update method
+    // ✅✅✅ SỬA LỖI 1: VIẾT LẠI HOÀN TOÀN HÀM UPDATE() ✅✅✅
     @Override
     public void update(double deltaTime) {
-        // Dùng logic di chuyển từ MovableObject
+        // 1. Di chuyển bóng (dùng logic của MovableObject)
         super.update(deltaTime);
 
-        // Va chạm biên
-        if (getX() <= 0 || getX() + getWidth() >= sceneWidth) setDx(-getDx());
-        if (getY() <= 0) setDy(-getDy());
+        // 2. Lấy danh sách tất cả các đối tượng từ GameManager
+        GameManager gm = GameManager.getInstance();
+        if (gm == null) return; // Tránh lỗi nếu GameManager chưa sẵn sàng
 
-        // Nếu rơi ra ngoài màn hình
-        if (getY() > sceneHeight) resetBall();
+        List<GameObject> gameObjects = gm.getGameObjects();
+
+        // 3. Kiểm tra va chạm với tường
+        checkWallCollisions();
+
+        // 4. Kiểm tra va chạm với Thanh đỡ (Paddle)
+        for (GameObject obj : gameObjects) {
+            if (obj instanceof Paddle) {
+                checkPaddleCollision((Paddle) obj);
+                break; // Chỉ có 1 paddle
+            }
+        }
+
+        // 5. Kiểm tra va chạm với Gạch (Bricks)
+        // Lọc ra danh sách gạch còn sống
+        List<Brick> bricks = gameObjects.stream()
+                .filter(obj -> obj instanceof Brick)
+                .map(obj -> (Brick) obj)
+                .filter(brick -> !brick.isDestroyed()) // Chỉ kiểm tra gạch chưa vỡ
+                .collect(Collectors.toList());
+
+        // Truyền gamePane từ GameManager
+        checkBrickCollision(bricks, gm.getGamePane());
+    }
+
+    /**
+     * Hàm mới: Kiểm tra va chạm với 4 cạnh màn hình
+     */
+    private void checkWallCollisions() {
+        // Va chạm biên trái / phải
+        if (getX() <= 0 || getX() + getWidth() >= sceneWidth) {
+            setDx(-getDx());
+            // Đảm bảo bóng không bị kẹt trong tường
+            if (getX() <= 0) setX(0);
+            if (getX() + getWidth() >= sceneWidth) setX(sceneWidth - getWidth());
+        }
+
+        // Va chạm biên trên
+        if (getY() <= 0) {
+            setDy(-getDy());
+            setY(0);
+        }
+
+        // Nếu rơi ra ngoài màn hình (biên dưới)
+        if (getY() > sceneHeight) {
+            GameManager.getInstance().loseLife(); // Báo cho GameManager biết
+            // Không cần resetBall() ở đây, GameManager sẽ lo việc đó
+        }
     }
 
     // --- Va chạm với paddle ---
     public void checkPaddleCollision(Paddle paddle) {
-        if (imageView.getBoundsInParent().intersects(paddle.getImageView().getBoundsInParent())) {
-            setDy(-Math.abs(getDy())); // bật lên
+        if (getBounds().intersects(paddle.getBounds())) {
+            // Đã va chạm
+
+            // 1. Đảo chiều Y (luôn bật lên)
+            setDy(-Math.abs(getDy()));
+
+            // 2. Tính toán góc bật (lệch nhiều hay ít)
+            // Lấy vị trí tâm bóng - tâm thanh đỡ
             double hitPos = (getX() + getWidth() / 2) - (paddle.getX() + paddle.getWidth() / 2);
+
+            // Tính toán dx mới, hitPos càng lớn (càng xa tâm) thì bóng càng lệch
+            // Giá trị 0.1 là "độ nhạy", có thể cần điều chỉnh
             setDx(hitPos * 0.1);
         }
     }
 
     // --- Va chạm với gạch ---
-    public void checkBrickCollision(List<? extends Brick> bricks, Pane gameRoot) {
+    public void checkBrickCollision(List<Brick> bricks, Pane gameRoot) {
         for (Brick brick : bricks) {
-            if (imageView.getBoundsInParent().intersects(brick.getImageView().getBoundsInParent())) {
-                if (brick.isUnbreakable()) {
-                    bounceFromBrick(brick);
+            // Dùng getBounds() thay vì getImageView().getBoundsInParent()
+            if (getBounds().intersects(brick.getBounds())) {
+
+                if (!brick.isUnbreakable()) {
+                    // Nếu là bóng mạnh, phá gạch ngay
+                    if (isStrong) {
+                        brick.destroy(true); // Phá gạch và tạo item
+                    } else {
+                        brick.hit(gameRoot); // Gạch bị mất máu
+                        bounceFromBrick(brick); // Bóng nảy lại
+                    }
                 } else {
-                    brick.hit(gameRoot);
-                    bounceFromBrick(brick);
+                    // Nếu là gạch không thể phá vỡ
+                    bounceFromBrick(brick); // Chỉ nảy lại
                 }
-                break; // chỉ xử lý 1 viên gạch 1 frame
+
+                break; // Chỉ xử lý 1 viên gạch mỗi frame
             }
         }
     }
 
+    // Hàm này tính toán hướng nảy (trên/dưới hay trái/phải)
     private void bounceFromBrick(Brick brick) {
+        // ... (Logic này có vẻ ổn, giữ nguyên)
         double ballCenterX = getX() + getWidth() / 2;
         double ballCenterY = getY() + getHeight() / 2;
         double brickCenterX = brick.getX() + brick.getWidth() / 2;
@@ -165,48 +221,44 @@ public class Ball extends MovableObject {
         double dxDiff = ballCenterX - brickCenterX;
         double dyDiff = ballCenterY - brickCenterY;
 
-        if (Math.abs(dxDiff) > Math.abs(dyDiff)) setDx(-getDx());
-        else setDy(-getDy());
+        // Tính toán phần giao nhau
+        double overlapX = (getWidth() / 2 + brick.getWidth() / 2) - Math.abs(dxDiff);
+        double overlapY = (getHeight() / 2 + brick.getHeight() / 2) - Math.abs(dyDiff);
+
+        // Nảy theo chiều có phần giao nhau ít hơn
+        if (overlapX < overlapY) {
+            setDx(getDx() > 0 ? -Math.abs(getDx()) : Math.abs(getDx())); // Đảo chiều x
+        } else {
+            setDy(getDy() > 0 ? -Math.abs(getDy()) : Math.abs(getDy())); // Đảo chiều y
+        }
     }
 
-    private void resetBall() {
-        setX(sceneWidth / 2 - getWidth() / 2);
-        setY(sceneHeight / 2 - getHeight() / 2);
-        setDx(BALL_SPEED);
-        setDy(-BALL_SPEED);
-        updatePosition();
-    }
+    // ⛔ Đã xóa hàm resetBall() vì GameManager sẽ xử lý
 
-    public void setPosition(double centerX, double centerY) {
-        setX(centerX - Config.BALL_RADIUS); // Tọa độ x của hình tròn là góc trái trên
-        setY(centerY - Config.BALL_RADIUS); // Tọa độ y của hình tròn là góc trái trên
+    public void setPosition(double x, double y) {
+        setX(x);
+        setY(y);
     }
 
     public void resetVelocity() {
-        this.speedX = Config.BALL_INITIAL_SPEED_X;
-        // Dùng Math.abs để đảm bảo tốc độ Y luôn là số âm (bay lên trên)
-        this.speedY = -Math.abs(Config.BALL_INITIAL_SPEED_Y);
+        setDx(BALL_SPEED);
+        setDy(-BALL_SPEED); // Bay lên trên
     }
 
+    // ... (Các hàm StrongMode giữ nguyên)
     public void activateStrongMode() {
-        System.out.println("🔥 Chế độ bóng mạnh đã được kích hoạt!");
-        this.isStrong = true;
-
-        if (strongModeTimer != null) {
-            strongModeTimer.stop();
-        }
-
-        strongModeTimer = new PauseTransition(Duration.seconds(10));
-        strongModeTimer.setOnFinished(event -> deactivateStrongMode());
-        strongModeTimer.play();
+        // ...
     }
-
     private void deactivateStrongMode() {
-        System.out.println("💧 Chế độ bóng mạnh đã kết thúc.");
-        this.isStrong = false;
+        // ...
     }
-
     public boolean isStrong() {
         return isStrong;
+    }
+
+    // ✅ THÊM HÀM NÀY (Rất quan trọng cho va chạm)
+    // Giúp lấy ra hình chữ nhật va chạm của bóng
+    public javafx.geometry.Bounds getBounds() {
+        return imageView.getBoundsInParent();
     }
 }

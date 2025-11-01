@@ -10,7 +10,7 @@ import javafx.scene.layout.Pane;
 public class HeartItem extends PowerUp {
 
     public HeartItem(Pane gameRoot, Paddle paddle, double x, double y) {
-        super(gameRoot, paddle, x, y, "/resources/images/items/Item5.png");
+        super(gameRoot, paddle, x, y, "/images/items/Item5.png");
     }
 
     @Override
