@@ -1,6 +1,7 @@
 package gameobject.bricks;
 
 import gameobject.items.DoubleBallItem;
+import application.Config;
 import gameobject.items.ExpandPaddleItem;
 import gameobject.items.HeartItem;
 import gameobject.core.Brick;
@@ -17,7 +18,7 @@ public class QuestionBrick extends Brick {
     private Paddle paddle;
 
     public QuestionBrick(double x, double y, Pane gamePane, Paddle paddle) {
-        super(x, y, 50, 20, 1, "/images/brick/Brick7.png", gamePane);
+        super(x, y, Config.BRICK_WIDTH, Config.BRICK_HEIGHT, 1, "/images/brick/Brick7.png", gamePane);
         this.paddle = paddle;
     }
 

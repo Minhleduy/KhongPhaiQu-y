@@ -2,6 +2,7 @@ package gameobject.bricks;
 
 import gameobject.core.Brick;
 import javafx.scene.layout.Pane;
+import application.Config;
 
 /**
  * Gạch không thể phá hủy — bóng chạm vào sẽ bị bật lại.
@@ -10,7 +11,7 @@ public class UnbreakableBrick extends Brick {
 
     public UnbreakableBrick(double x, double y, Pane gamePane) {
         // hitPoints = -1 để đánh dấu là "không phá hủy"
-        super(x, y, 50, 20, -1, "/item/brick/Brick1.png", gamePane);
+        super(x, y, Config.BRICK_WIDTH, Config.BRICK_HEIGHT, -1, "/item/brick/Brick1.png", gamePane);
     }
 
     @Override

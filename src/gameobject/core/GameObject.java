@@ -87,8 +87,14 @@ public abstract class GameObject {
     }
 
     /** Trả về khung va chạm (collision bounds) */
-    public Rectangle2D getBounds() {
-        return new Rectangle2D(x, y, width, height);
+    public javafx.geometry.Bounds getBounds() {
+        if (this.imageView != null) {
+            return this.imageView.getBoundsInParent();
+        }
+
+        // Fallback nếu không có ảnh, dùng tọa độ x, y
+        // (Ít chính xác hơn cho va chạm)
+        return new javafx.geometry.BoundingBox(this.x, this.y, this.width, this.height);
     }
 
     /** Hàm cập nhật mỗi frame (override trong class con nếu cần) */

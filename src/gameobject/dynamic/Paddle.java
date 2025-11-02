@@ -7,7 +7,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
 public class Paddle extends MovableObject {
-    private ImageView imageView;
+    //private ImageView imageView;
     private final double MOVE_SPEED = 8;
     private double sceneWidth;
     private int lives = 3;
@@ -21,7 +21,7 @@ public class Paddle extends MovableObject {
 
         // Load ảnh paddle
         Image image = new Image(getClass().getResourceAsStream("/images/paddle/paddle1.png"));
-        imageView = new ImageView(image);
+        this.imageView = new ImageView(image);
 
         // Cập nhật width, height từ ảnh thực tế
         setWidth(image.getWidth());
@@ -32,7 +32,7 @@ public class Paddle extends MovableObject {
         imageView.setLayoutY(startY);
 
         // Thêm paddle vào Pane
-        gameRoot.getChildren().add(imageView);
+        gameRoot.getChildren().add(this.imageView);
 
         // Gắn sự kiện di chuột
         enableMouseControl(gameRoot);

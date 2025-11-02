@@ -8,38 +8,31 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 
-/**
- * Quản lý việc hiển thị và thay đổi ảnh nền cho một Pane.
- */
 public class BackgroundManager {
+    private final Pane gamePane;
 
-    private final Pane gamePane; // Pane chính của game
-
-    /**
-     * Khởi tạo trình quản lý với một Pane cụ thể.
-     * @param gamePane Pane sẽ được đặt ảnh nền.
-     */
     public BackgroundManager(Pane gamePane) {
         this.gamePane = gamePane;
     }
 
-    /**
-     * Đặt ảnh nền mới cho Pane.
-     * @param imagePath Đường dẫn đến file ảnh nền.
-     */
-    public void setBackground(String imagePath) {
-        Image image = ImageLoader.loadImage(imagePath);
+    public void setBackgroundForLevel(int level) {
+        String path = switch (level) {
+            case 1 -> "/images/background/Background1.png";
+            case 2 -> "/images/background/Background2.png";
+            case 3 -> "/images/background/Background3.png";
+            case 4 -> "/images/background/Background4.png";
+            case 5 -> "/images/npc/Boss.png";
+            default -> "/images/background/Background1.png";
+        };
+        Image image = ImageLoader.loadImage(path);
         if (image != null) {
-            BackgroundImage backgroundImage = new BackgroundImage(
+            BackgroundImage bg = new BackgroundImage(
                     image,
-                    BackgroundRepeat.NO_REPEAT,
-                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
                     BackgroundPosition.CENTER,
                     new BackgroundSize(1.0, 1.0, true, true, false, false)
             );
-            gamePane.setBackground(new Background(backgroundImage));
-        } else {
-            System.err.println("Không thể đặt ảnh nền vì không tải được ảnh: " + imagePath);
+            gamePane.setBackground(new Background(bg));
         }
     }
 }

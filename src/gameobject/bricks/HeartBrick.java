@@ -4,6 +4,7 @@ import gameobject.items.HeartItem;
 import gameobject.core.Brick;
 import gameobject.dynamic.Paddle;
 import javafx.scene.layout.Pane;
+import application.Config;
 
 /**
  * Gạch trái tim - khi phá sẽ rơi ra item tăng mạng
@@ -14,7 +15,7 @@ public class HeartBrick extends Brick {
 
 
     public HeartBrick(double x, double y, Pane gamePane, Paddle paddle) {
-        super(x, y, 50, 20, 1, "/images/brick/Brick8.png", gamePane);
+        super(x, y, Config.BRICK_WIDTH, Config.BRICK_HEIGHT, 1, "/images/brick/Brick8.png", gamePane);
         this.paddle = paddle;
 
 

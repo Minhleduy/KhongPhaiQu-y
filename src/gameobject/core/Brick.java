@@ -8,7 +8,7 @@ import javafx.scene.layout.Pane;
 public abstract class Brick extends GameObject {
     protected int hitPoints;        // Số lần cần trúng để vỡ
     protected boolean destroyed;    // Đã bị phá chưa?
-    protected ImageView imageView;  //  ảnh của gạch
+    //protected ImageView imageView;  //  ảnh của gạch
 
     public Brick(double x, double y, double width, double height, int hitPoints, String imagePath, Pane gamePane) {
         super(x, y, width, height);
@@ -17,14 +17,14 @@ public abstract class Brick extends GameObject {
 
         // Tạo ảnh gạch
         Image image = new Image(getClass().getResourceAsStream(imagePath));
-        imageView = new ImageView(image);
+        this.imageView = new ImageView(image);
         imageView.setFitWidth(width);
         imageView.setFitHeight(height);
         imageView.setLayoutX(x);
         imageView.setLayoutY(y);
 
         // Thêm vào gamePane
-        gamePane.getChildren().add(imageView);
+        gamePane.getChildren().add(this.imageView);
     }
 
     /**
@@ -65,8 +65,18 @@ public abstract class Brick extends GameObject {
     public boolean isBreakable() {
         return true;
     }
+//    public javafx.geometry.Bounds getBounds() {
+//        return imageView.getBoundsInParent(); // CHÍNH XÁC HƠN
+//    }
 
     public void update() {
         // Gạch không di chuyển
+    }
+
+    public void instantDestroy(Pane gamePane) {
+        if (destroyed || isUnbreakable()) return;
+
+        this.hitPoints = 1; // Đặt máu về 1
+        this.hit(gamePane); // Gọi hit() để máu trừ về 0 và kích hoạt mọi logic
     }
 }

@@ -36,13 +36,23 @@ public class Main extends Application {
      */
     private void startGameLoop() {
         gameLoop = new AnimationTimer() {
+            private long lastUpdate = 0;
             @Override
             public void handle(long now) {
-                // Gọi hàm update của GameManager
-                GameManager.getInstance().update();
-            }
+                if (lastUpdate == 0) lastUpdate = now;
+                    double deltaTime = (now - lastUpdate) / 1_000_000_000.0; // giây
+                    lastUpdate = now;
+
+                // QUAN TRỌNG: Giới hạn deltaTime.
+                // Nếu game bị treo 1 giây, bóng không nên bay xuyên tường.
+                if (deltaTime > 0.032) { // Giới hạn ở ~30 FPS
+                    deltaTime = 0.032;
+                }
+
+                // SỬA LẠI: Truyền deltaTime vào GameManager
+                GameManager.getInstance().update(deltaTime);
+}
         };
-        // Bắt đầu vòng lặp
         gameLoop.start();
     }
 

@@ -2,6 +2,7 @@ package application;
 
 import Arkanoid.ui.GameUIController; // ✅ IMPORT CONTROLLER CỦA BẠN
 import javafx.fxml.FXMLLoader;
+import utils.BackgroundManager;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane; // ✅ IMPORT PANE

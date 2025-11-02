@@ -1,5 +1,6 @@
 package Arkanoid.ui;
-
+import application.GameManager;
+import application.SceneManager;
 import Arkanoid.util.AnimationHelper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,6 +19,7 @@ public class GameOverController {
     @FXML
     void handlePlayAgainAction(ActionEvent event) {
         System.out.println("Nút Chơi Lại (Game Over) đã được nhấn!");
+        GameManager.getInstance().startGame();
     }
     @FXML
     public void initialize() {
@@ -28,5 +30,6 @@ public class GameOverController {
     @FXML
     void handleMainMenuAction(ActionEvent event) {
         System.out.println("Nút Về Menu (Game Over) đã được nhấn!");
+        SceneManager.getInstance().showMainMenuScene();
     }
 }

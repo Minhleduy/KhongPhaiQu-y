@@ -4,6 +4,7 @@ import gameobject.items.DoubleBallItem;
 import gameobject.core.Brick;
 import gameobject.dynamic.Paddle;
 import javafx.scene.layout.Pane;
+import application.Config;
 
 /**
  * Gạch Double Ball - khi phá sẽ rơi ra item tạo thêm bóng
@@ -13,7 +14,7 @@ public class DoubleBallBrick extends Brick {
     private Paddle paddle;
 
     public DoubleBallBrick(double x, double y, Pane gamePane, Paddle paddle) {
-        super(x, y, 50, 20, 1, "/images/brick/Brick2.png", gamePane);
+        super(x, y, Config.BRICK_WIDTH, Config.BRICK_HEIGHT, 1, "/images/brick/Brick2.png", gamePane);
         this.paddle = paddle;
     }
 

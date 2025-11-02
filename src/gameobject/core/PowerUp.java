@@ -1,97 +1,63 @@
 package gameobject.core;
+
+import application.GameManager;
 import gameobject.dynamic.Paddle;
-import javafx.animation.AnimationTimer;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
-/**
- * Lớp cha cho tất cả các PowerUp (item rơi ra khi phá gạch)
- */
 public abstract class PowerUp extends MovableObject {
     protected Pane gameRoot;
     protected Paddle paddle;
-    protected boolean active = true;
-    private AnimationTimer fallTimer;
+    //protected ImageView imageView;
 
     public PowerUp(Pane gameRoot, Paddle paddle, double x, double y, String imagePath) {
-        super(x, y, 30, 30, new Image(PowerUp.class.getResourceAsStream(imagePath)));
+        super(x, y, 45, 45, new Image(PowerUp.class.getResourceAsStream(imagePath)));
         this.gameRoot = gameRoot;
         this.paddle = paddle;
+        this.dy = 100.0 ; //tốc độ rơi
 
         Image image = new Image(getClass().getResourceAsStream(imagePath));
-        imageView = new ImageView(image);
+        this.imageView = new ImageView(image);
+        imageView.setFitWidth(45);
+        imageView.setFitHeight(45);
         imageView.setLayoutX(x);
         imageView.setLayoutY(y);
-        gameRoot.getChildren().add(imageView);
+        gameRoot.getChildren().add(this.imageView);
 
-        startFalling();
+        // THÊM VÀO GAMEMANAGER ĐỂ UPDATE
+        GameManager.getInstance().addGameObject(this);
     }
 
-    /**
-     * Bắt đầu cho item rơi xuống
-     */
-    private void startFalling() {
-        fallTimer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (!active) {
-                    stop();
-                    return;
-                }
+    @Override
+    public void update(double deltaTime) {
+        setY(getY() + dy * deltaTime);
+        imageView.setLayoutY(getY());
 
-                // Di chuyển item - GIỮ NGUYÊN logic từ code cũ
-                y += 2; // speedY = 2
-                imageView.setLayoutY(y);
+        if (getY() > gameRoot.getHeight()) {
+            remove();
+            return;
+        }
 
-                // Nếu rơi quá màn hình thì xóa
-                if (y > gameRoot.getHeight()) {
-                    remove();
-                    return;
-                }
-
-                // Kiểm tra va chạm với paddle
-                if (checkCollision()) {
-                    applyEffect(paddle);
-                    remove();
-                }
-            }
-        };
-        fallTimer.start();
+        if (checkCollision()) {
+            applyEffect(paddle);
+            remove();
+        }
     }
 
-    /**
-     * Kiểm tra va chạm item với paddle
-     */
     private boolean checkCollision() {
         return imageView.getBoundsInParent()
                 .intersects(paddle.getImageView().getBoundsInParent());
     }
 
-    /**
-     * Áp dụng hiệu ứng khi paddle nhận item
-     */
     protected abstract void applyEffect(Paddle paddle);
 
-    /**
-     * Xóa item khỏi màn hình
-     */
-    protected void remove() {
-        active = false;
-        fallTimer.stop();
+    private void remove() {
+        GameManager.getInstance().removeGameObject(this);
         gameRoot.getChildren().remove(imageView);
     }
 
-    /**
-     * Có thể dùng để update logic thêm nếu cần
-     */
-    public void update() {
-        // hiện tại không cần làm gì, AnimationTimer đã xử lý
-    }
-
-    @Override
-    public void update(double deltaTime) {
-        // Ghi đè từ MovableObject nhưng giữ nguyên logic cũ
-        update();
+    public ImageView getImageView() {
+        return imageView;
     }
 }

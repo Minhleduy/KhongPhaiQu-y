@@ -1,5 +1,7 @@
 package gameobject.dynamic;
 
+import application.GameManager;
+import gameobject.bricks.NormalBrick;
 import gameobject.core.MovableObject;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -111,20 +113,14 @@ public class Boss extends MovableObject {
      * Boss sinh ra gạch khi máu thấp
      */
     private void spawnBricks() {
-        // Chỉ sinh gạch khi máu dưới 30%
         if ((double)health / maxHealth > 0.3) return;
-
-        System.out.println("🔥 Boss spawning bricks!");
-
-        // Tạo 3-5 viên gạch ngẫu nhiên
+        System.out.println("Boss spawning bricks!");
         int brickCount = 3 + random.nextInt(3);
         for (int i = 0; i < brickCount; i++) {
-            // Tạo gạch ở vị trí ngẫu nhiên phía dưới boss
             double brickX = random.nextDouble() * (gameRoot.getWidth() - 50);
             double brickY = getY() + getHeight() + 20 + random.nextDouble() * 100;
-
-            // Có thể tạo các loại gạch khác nhau
-            // new NormalBrick(brickX, brickY, gameRoot, null); // Cần paddle reference
+            NormalBrick brick = new NormalBrick(brickX, brickY, gameRoot);
+            GameManager.getInstance().addGameObject(brick); // THÊM VÀO GAME
         }
     }
 

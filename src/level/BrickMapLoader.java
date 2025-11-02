@@ -1,5 +1,6 @@
 package level;
 
+import application.Config;
 import gameobject.dynamic.Paddle;
 import gameobject.core.Brick;
 import gameobject.bricks.*;
@@ -10,8 +11,8 @@ import java.util.List;
 
 public class BrickMapLoader {
 
-    private static final int BRICK_WIDTH = 70;
-    private static final int BRICK_HEIGHT = 25;
+//    private static final int BRICK_WIDTH = 70;
+//    private static final int BRICK_HEIGHT = 25;
     private static final int PADDING = 5;
     private static final int MAP_OFFSET_X = 30;
     private static final int MAP_OFFSET_Y = 50;
@@ -49,8 +50,8 @@ public class BrickMapLoader {
                     continue;
                 }
 
-                double brickX = MAP_OFFSET_X + x * (BRICK_WIDTH + PADDING);
-                double brickY = MAP_OFFSET_Y + y * (BRICK_HEIGHT + PADDING);
+                double brickX = MAP_OFFSET_X + x * (Config.BRICK_WIDTH + PADDING);
+                double brickY = MAP_OFFSET_Y + y * (Config.BRICK_HEIGHT + PADDING);
 
                 Brick brick = null;
                 switch (brickType) {
@@ -74,6 +75,9 @@ public class BrickMapLoader {
                         break;
                     case 'B':
                         brick = new BlockBrick(brickX, brickY, gameRoot, paddle);
+                        break;
+                    case 'T':
+                        brick = new ToughBrick(brickX, brickY, gameRoot);
                         break;
                 }
 

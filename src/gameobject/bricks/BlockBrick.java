@@ -4,6 +4,7 @@ import gameobject.items.BlockItem;
 import gameobject.core.Brick;
 import gameobject.dynamic.Paddle;
 import javafx.scene.layout.Pane;
+import application.Config;
 
 
 public class BlockBrick extends Brick {
@@ -11,7 +12,7 @@ public class BlockBrick extends Brick {
     private Paddle paddle;
 
     public BlockBrick(double x, double y, Pane gamePane, Paddle paddle) {
-        super(x, y, 50, 20, 1, "/images/brick/Brick6.png", gamePane);
+        super(x, y, Config.BRICK_WIDTH, Config.BRICK_HEIGHT, 1, "/images/brick/Brick1.png", gamePane);
         this.paddle = paddle;
     }
 
@@ -28,6 +29,6 @@ public class BlockBrick extends Brick {
         double itemX = getX() + getWidth() / 2;
         double itemY = getY() + getHeight();
 
-        new BlockItem(gamePane, paddle, itemX, itemY);  // GIỜ ĐÚNG PACKAGE
+        new BlockItem(gamePane, paddle, itemX, itemY);
     }
 }

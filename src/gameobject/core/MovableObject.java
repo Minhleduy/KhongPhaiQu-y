@@ -34,8 +34,8 @@ public abstract class MovableObject extends GameObject {
     @Override
     public void update(double deltaTime) {
         // SỬA: Dùng setX/setY để cập nhật cả ImageView (nếu có)
-        setX(getX() + dx * deltaTime);
-        setY(getY() + dy * deltaTime);
+        setX(getX() + getDx() * deltaTime);
+        setY(getY() + getDy() * deltaTime);
     }
 
     // --- Vẽ vật thể ---
