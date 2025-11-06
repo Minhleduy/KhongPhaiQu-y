@@ -14,25 +14,22 @@ public class HuyTestMain extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            URL fxmlLocation = getClass().getResource("/ui/MainMenu.fxml");
+            String fxmlName = "MainMenu.fxml";
+            //String fxmlName = "WinScreen.fxml";
+            //String fxmlName = "GameOver.fxml";
+            //String fxmlName = "StoryDialog.fxml";
+            //String fxmlName = "GameUI.fxml"
+
+            URL fxmlLocation = getClass().getResource("/ui/" + fxmlName);
             if (fxmlLocation == null) {
-                System.out.println("Không tìm thấy file MainMenu.fxml. Hãy kiểm tra lại đường dẫn.");
+                System.out.println("Không tìm thấy file " + fxmlName + ". Hãy kiểm tra lại đường dẫn trong thư mục /ui/");
                 return;
             }
-
-            // 2. Tải file FXML đó lên
             Parent root = FXMLLoader.load(fxmlLocation);
+            Scene scene = new Scene(root, 1280, 720);
 
-            // 3. Tạo một Scene (khung cảnh) chứa giao diện vừa tải
-            Scene scene = new Scene(root);
-
-            // 4. Đặt tiêu đề cho cửa sổ
-            primaryStage.setTitle("Arkanoid - Main Menu");
-
-            // 5. Gắn Scene vào Stage (cửa sổ chính)
+            primaryStage.setTitle("Arkanoid - Test " + fxmlName);
             primaryStage.setScene(scene);
-
-            // 6. Hiển thị cửa sổ lên màn hình
             primaryStage.show();
 
         } catch (IOException e) {
