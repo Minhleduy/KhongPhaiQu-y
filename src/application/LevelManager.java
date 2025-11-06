@@ -1,5 +1,7 @@
 package application;
 
+import Arkanoid.ui.GameUIController;
+import Arkanoid.util.BackgroundManager;
 import gameobject.core.Brick;
 import gameobject.dynamic.Ball;
 import gameobject.dynamic.Paddle;
@@ -46,6 +48,12 @@ public class LevelManager {
 
         List<Brick> bricks = BrickMapLoader.load(levelNumber, gameRoot, paddle);
         bricks.forEach(gm::addGameObject);
+        if (gm.getGameUIController() != null) {
+            gm.getGameUIController().updateLevel(levelNumber);
+        }
+        if (gm.getBackgroundManager() != null) {
+            gm.getBackgroundManager().setBackgroundForLevel(levelNumber);
+        }
 
         StoryManager.getInstance().showStoryForLevel(levelNumber);
     }

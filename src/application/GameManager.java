@@ -1,5 +1,6 @@
 package application;
 
+import javafx.scene.image.ImageView;
 import Arkanoid.ui.GameUIController;
 import Arkanoid.util.BackgroundManager;
 import Arkanoid.util.SoundManager;
@@ -60,34 +61,31 @@ public class GameManager {
     }
 
     public void update(double deltaTime) {
+        // Khối 1: Cập nhật TẤT CẢ đối tượng
         if (currentState == GameState.PLAYING || currentState == GameState.BOSS_FIGHT) {
             for (GameObject obj : new ArrayList<>(gameObjects)) {
-                obj.update(deltaTime);
+                obj.update(deltaTime); // <-- Ball.update() sẽ tự lo toàn bộ va chạm
             }
             if (currentState == GameState.PLAYING && isLevelComplete()) {
                 LevelManager.getInstance().progressToNextStage();
             }
-            if (currentState == GameState.BOSS_FIGHT) {
-                Ball ball = findBall();
-                if (ball != null && boss != null && boss.isAlive()) {
-                    if (boss.checkBallCollision(ball)) {
-                        boss.takeDamage(1);
+        }
 
-                        if (gameUIController != null) { // <-- THÊM DÒNG NÀY
-                            gameUIController.updateBossHealth(boss.getHealth(), boss.getMaxHealth());
-                        }
+        // Khối 2: CHỈ kiểm tra điều kiện thắng
+        if (currentState == GameState.BOSS_FIGHT) {
+            // Logic va chạm đã được chuyển vào Ball.java
 
-                        ball.reverseSpeedY();
-                    }
-                }
-                if (boss != null && !boss.isAlive()) {
-                    setCurrentState(GameState.GAME_OVER);
-                    if (soundManager != null) soundManager.stopMusic();
-                    sceneManager.showWinScreen();
-                }
+            // CHỈ GIỮ LẠI logic kiểm tra chiến thắng
+            if (boss != null && !boss.isAlive()) {
+                setCurrentState(GameState.GAME_OVER);
+                if (soundManager != null) soundManager.stopMusic();
+                sceneManager.showWinScreen();
             }
         }
     }
+
+
+
 
     private Ball findBall() {
         for (GameObject obj : gameObjects) {
@@ -112,8 +110,6 @@ public class GameManager {
             this.currentState = GameState.GAME_OVER;
             if (soundManager != null) soundManager.stopMusic();
             sceneManager.showGameOverScene(this.score);
-        } else {
-            resetBall();
         }
     }
 
@@ -141,52 +137,82 @@ public class GameManager {
     }
 
     public void onBallFallen(Ball fallenBall) {
+
+        // 1. Xóa quả bóng bị rơi (Giữ nguyên)
         fallenBall.removeGraphics();
         removeGameObject(fallenBall);
+
+        // 2. Đếm bóng còn lại (Giữ nguyên)
         long remainingBalls = getGameObjects().stream()
                 .filter(obj -> obj instanceof Ball)
                 .count();
 
+        // 3. Logic mới
         if (remainingBalls == 0) {
+            // Không còn quả bóng nào!
+
+            // 3a. Gọi logic mất mạng (có thể được khiên đỡ)
             loseLife();
+
+            // 3b. Hồi sinh bóng nếu game chưa kết thúc
+            // Kiểm tra: Nếu game CHƯA KẾT THÚC (tức là còn mạng, hoặc khiên vừa đỡ)
+            // thì phải hồi sinh bóng mới.
+            if (currentState != GameState.GAME_OVER) {
+                resetBall(); // (Hàm resetBall của bạn sẽ gọi spawnNewBall)
+            }
         }
+        // (Nếu remainingBalls > 0, không làm gì cả, đúng như bạn muốn)
     }
+
 
     private boolean isLevelComplete() {
         return gameObjects.stream()
                 .filter(obj -> obj instanceof Brick)
                 .map(obj -> (Brick) obj)
-                .noneMatch(Brick::isBreakable);
+                .noneMatch(brick -> brick.isBreakable() && !brick.isDestroyed());
     }
 
-    public void startBossFight() {
-        setCurrentState(GameState.BOSS_FIGHT);
+public void startBossFight() {
+    setCurrentState(GameState.BOSS_FIGHT);
 
-        if (gameUIController != null) { // <-- THÊM KHỐI LỆNH NÀY
-            gameUIController.showBossUI();
-        }
+    // 1. Dọn dẹp Level 4 (Đã sửa)
+    clearGameObjects();
 
-        clearGameObjects();
-        this.boss = new Boss(this.gamePane, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
-
-        if (gameUIController != null) { // <-- THÊM CẬP NHẬT MÁU BAN ĐẦU
-            gameUIController.updateBossHealth(this.boss.getHealth(), this.boss.getMaxHealth());
-        }
-        addGameObject(this.boss);
-
-        double paddleStartX = (Config.SCREEN_WIDTH - Config.PADDLE_WIDTH) / 2.0;
-        double paddleStartY = Config.PADDLE_Y_POSITION;
-        double ballStartX = Config.SCREEN_WIDTH / 2.0;
-        double ballStartY = Config.SCREEN_HEIGHT / 2.0;
-
-        addGameObject(new Paddle(this.gamePane, paddleStartX, paddleStartY, Config.SCREEN_WIDTH));
-        Ball bossBall = new Ball(this.gamePane, ballStartX, ballStartY, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
-        addGameObject(bossBall);
-
-        int bossLevelID = 5;
-        if (gameUIController != null) gameUIController.updateLevel(bossLevelID);
-        if (backgroundManager != null) backgroundManager.setBackgroundForLevel(bossLevelID);
+    // 2. Cập nhật Giao diện (UI) cho màn Boss
+    if (gameUIController != null) {
+        gameUIController.showBossUI(); // <-- Hiển thị thanh máu Boss
     }
+
+    // 3. Tạo Boss và thêm vào game
+    this.boss = new Boss(this.gamePane, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+    addGameObject(this.boss);
+
+    // 4. Lấy vị trí bắt đầu
+    double paddleStartX = (Config.SCREEN_WIDTH - Config.PADDLE_WIDTH) / 2.0;
+    double paddleStartY = Config.PADDLE_Y_POSITION;
+    double ballStartX = Config.SCREEN_WIDTH / 2.0;
+    double ballStartY = Config.SCREEN_HEIGHT / 2.0;
+
+    // 5. (LỖI CÓ THỂ Ở ĐÂY) Tạo và thêm PADDLE MỚI
+    // Hãy đảm bảo bạn CÓ dòng code này
+    addGameObject(new Paddle(this.gamePane, paddleStartX, paddleStartY, Config.SCREEN_WIDTH));
+
+    // 6. (LỖI CÓ THỂ Ở ĐÂY) Tạo và thêm BALL MỚI
+    // Hãy đảm bảo bạn CÓ các dòng code này
+    Ball bossBall = new Ball(this.gamePane, ballStartX, ballStartY, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+    addGameObject(bossBall);
+
+    // 7. Cập nhật Hình nền
+    int bossLevelID = 5; // (ID cho hình nền boss)
+    if (backgroundManager != null) {
+        backgroundManager.setBackgroundForLevel(bossLevelID);
+    }
+
+    // Cập nhật thanh máu Boss lần đầu
+    if (gameUIController != null && boss != null) {
+        gameUIController.updateBossHealth(boss.getHealth(), boss.getMaxHealth());
+    }
+}
     public void addLife() {
         if (this.lives < Config.INITIAL_LIVES) { // Giả sử có giới hạn mạng tối đa
             this.lives++;
@@ -195,10 +221,31 @@ public class GameManager {
             }
         }
     }
+    public void clearGameObjects() {
 
+        // 1. Lặp qua danh sách logic HIỆN TẠI (trước khi xóa)
+        for (GameObject obj : gameObjects) {
+
+            // 2. Lấy hình ảnh (ImageView) của từng đối tượng
+            // (Chúng ta đã chuẩn hóa việc này ở các bước sửa lỗi trước)
+            ImageView view = obj.getImageView();
+
+            // 3. Yêu cầu gamePane xóa hình ảnh đó khỏi màn chơi
+            if (view != null && gamePane != null) {
+                gamePane.getChildren().remove(view);
+            }
+        }
+
+        // 4. Sau khi đã xóa hết hình ảnh, BÂY GIỜ mới xóa danh sách logic
+        this.gameObjects.clear();
+    }
+
+    public BackgroundManager getBackgroundManager() {
+        return this.backgroundManager;
+    }
     public void addGameObject(GameObject obj) { this.gameObjects.add(obj); }
     public void removeGameObject(GameObject obj) { this.gameObjects.remove(obj); }
-    public void clearGameObjects() { this.gameObjects.clear(); }
+    //public void clearGameObjects() { this.gameObjects.clear(); }
     public List<GameObject> getGameObjects() { return this.gameObjects; }
     public GameState getGameState() { return currentState; }
     public void setCurrentState(GameState state) { this.currentState = state; }

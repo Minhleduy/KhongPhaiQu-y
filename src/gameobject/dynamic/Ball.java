@@ -104,6 +104,7 @@ public class Ball extends MovableObject {
 
     // ✅✅✅ LỖI 2: VIẾT LẠI HOÀN TOÀN HÀM UPDATE() ✅✅✅
     @Override
+
     public void update(double deltaTime) {
         // 1. Di chuyển bóng (lấy từ MovableObject)
         super.update(deltaTime);
@@ -124,7 +125,29 @@ public class Ball extends MovableObject {
             }
         }
 
-        // 5. Kiểm tra va chạm Gạch (Bricks)
+        // 5. --- LOGIC MỚI: KIỂM TRA VA CHẠM BOSS ---
+        // Chỉ chạy khi đang ở màn Boss
+        if (gm.getGameState() == GameManager.GameState.BOSS_FIGHT) {
+            Boss boss = gm.getBoss();
+            if (boss != null && boss.isAlive() && boss.checkBallCollision(this)) {
+
+                // --- Toàn bộ logic va chạm Boss được chuyển vào đây ---
+                boss.takeDamage(1);
+
+                if (gm.getGameUIController() != null) {
+                    gm.getGameUIController().updateBossHealth(boss.getHealth(), boss.getMaxHealth());
+                }
+
+                bounceFromBoss(boss); // <-- Dùng hàm vật lý của Ball
+
+                // QUAN TRỌNG: Dừng update frame này tại đây
+                // để ngăn nó kiểm tra va chạm Gạch (sửa lỗi Race Condition)
+                return;
+            }
+        }
+
+        // 6. Kiểm tra va chạm Gạch (Bricks)
+        // (Chỉ chạy nếu KHÔNG va chạm với Boss ở trên)
         List<Brick> bricks = gameObjects.stream()
                 .filter(obj -> obj instanceof Brick)
                 .map(obj -> (Brick) obj)
@@ -133,6 +156,7 @@ public class Ball extends MovableObject {
 
         checkBrickCollision(bricks, gm.getGamePane());
     }
+
 
     /**
      * Hàm mới: Kiểm tra va chạm với 4 cạnh màn hình
@@ -167,6 +191,10 @@ public class Ball extends MovableObject {
             double hitPos = (getX() + getWidth() / 2) - (paddle.getX() + paddle.getWidth() / 2);
             double normalizedHitPos = hitPos / (paddle.getWidth() / 2);
             setDx(normalizedHitPos * Config.BALL_MAX_SPEED_X);
+            if (isStrong) {
+                setDx(getDx() * STRONG_MODE_SPEED_MODIFIER);
+                setDy(getDy() * STRONG_MODE_SPEED_MODIFIER);
+            }
         }
     }
 
@@ -193,26 +221,55 @@ public class Ball extends MovableObject {
 
 
     private void bounceFromBrick(Brick brick) {
+        // Lấy tâm và kích thước
         double ballCenterX = getX() + getWidth() / 2;
         double ballCenterY = getY() + getHeight() / 2;
         double brickCenterX = brick.getX() + brick.getWidth() / 2;
         double brickCenterY = brick.getY() + brick.getHeight() / 2;
 
+        // Tính toán độ chênh lệch
         double dxDiff = ballCenterX - brickCenterX;
         double dyDiff = ballCenterY - brickCenterY;
 
+        // Tính toán độ "chồng lấn" (overlap)
         double overlapX = (getWidth() / 2 + brick.getWidth() / 2) - Math.abs(dxDiff);
         double overlapY = (getHeight() / 2 + brick.getHeight() / 2) - Math.abs(dyDiff);
 
-        // Nảy theo chiều có phần giao nhau ít hơn (chính xác hơn)
+        // So sánh độ chồng lấn
         if (overlapX < overlapY) {
-            if (dxDiff > 0) setDx(Math.abs(getDx())); // Va chạm bên trái gạch
-            else setDx(-Math.abs(getDx())); // Va chạm bên phải gạch
+            // --- VA CHẠM NGANG (TRÁI/PHẢI) ---
+
+            // 1. Đảo ngược vận tốc X
+            setDx(-getDx());
+
+            // 2. ĐẨY BÓNG RA (Push-out) - SỬA LỖI
+            if (dxDiff > 0) {
+                // Va chạm bên TRÁI GẠCH -> Đẩy bóng sang PHẢI
+                setX(brick.getX() + brick.getWidth() + 1);
+            } else {
+                // Va chạm bên PHẢI GẠCH -> Đẩy bóng sang TRÁI
+                setX(brick.getX() - getWidth() - 1);
+            }
+
         } else {
-            if (dyDiff > 0) setDy(Math.abs(getDy())); // Va chạm bên trên gạch
-            else setDy(-Math.abs(getDy())); // Va chạm bên dưới gạch
+            // --- VA CHẠM DỌC (TRÊN/DƯỚI) ---
+
+            // 1. Đảo ngược vận tốc Y
+            setDy(-getDy());
+
+            // 2. ĐẨY BÓNG RA (Push-out) - SỬA LỖI
+            if (dyDiff > 0) {
+                // Va chạm MẶT TRÊN của GẠCH -> Đẩy bóng XUỐNG DƯỚI
+                setY(brick.getY() + brick.getHeight() + 1);
+            } else {
+                // Va chạm MẶT DƯỚI của GẠCH -> Đẩy bóng LÊN TRÊN
+                setY(brick.getY() - getHeight() - 1);
+            }
         }
     }
+
+
+
 
     // ⛔ Đã xóa hàm resetBall() (GameManager sẽ lo việc reset vị trí)
 
@@ -308,6 +365,54 @@ public class Ball extends MovableObject {
         Pane gamePane = (Pane) this.imageView.getParent();
         if (gamePane != null) {
             gamePane.getChildren().remove(this.imageView);
+        }
+    }
+    public void bounceFromBoss(Boss boss) {
+        // Lấy tâm và kích thước
+        double ballCenterX = getX() + getWidth() / 2;
+        double ballCenterY = getY() + getHeight() / 2;
+        double bossCenterX = boss.getX() + boss.getWidth() / 2;
+        double bossCenterY = boss.getY() + boss.getHeight() / 2;
+
+        // Tính toán độ chênh lệch
+        double dxDiff = ballCenterX - bossCenterX;
+        double dyDiff = ballCenterY - bossCenterY;
+
+        // Tính toán độ "chồng lấn" (overlap)
+        double overlapX = (getWidth() / 2 + boss.getWidth() / 2) - Math.abs(dxDiff);
+        double overlapY = (getHeight() / 2 + boss.getHeight() / 2) - Math.abs(dyDiff);
+
+        // So sánh độ chồng lấn
+        if (overlapX < overlapY) {
+            // --- VA CHẠM NGANG (TRÁI/PHẢI) ---
+
+            // 1. Đảo ngược vận tốc X
+            setDx(-getDx());
+
+            // 2. ĐẨY BÓNG RA (Push-out)
+            if (dxDiff > 0) {
+                // Va chạm bên TRÁI Boss -> Đẩy bóng sang PHẢI
+                setX(boss.getX() + boss.getWidth() + 1);
+            } else {
+                // Va chạm bên PHẢI Boss -> Đẩy bóng sang TRÁI
+                setX(boss.getX() - getWidth() - 1);
+            }
+
+        } else {
+            // --- VA CHẠM DỌC (TRÊN/DƯỚI) ---
+
+            // 1. Đảo ngược vận tốc Y
+            setDy(-getDy());
+
+            // 2. ĐẨY BÓNG RA (Push-out)
+            if (dyDiff > 0) {
+                // Va chạm MẶT TRÊN của Boss -> Đẩy bóng XUỐNG DƯỚI
+                setY(boss.getY() + boss.getHeight() + 1);
+            } else {
+                // Va chạm MẶT DƯỚI của Boss -> Đẩy bóng LÊN TRÊN
+                setY(boss.getY() - getHeight() - 1);
+            }
+
         }
     }
 }

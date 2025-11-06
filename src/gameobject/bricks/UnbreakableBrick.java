@@ -11,7 +11,7 @@ public class UnbreakableBrick extends Brick {
 
     public UnbreakableBrick(double x, double y, Pane gamePane) {
         // hitPoints = -1 để đánh dấu là "không phá hủy"
-        super(x, y, Config.BRICK_WIDTH, Config.BRICK_HEIGHT, -1, "/item/brick/Brick1.png", gamePane);
+        super(x, y, Config.BRICK_WIDTH, Config.BRICK_HEIGHT, -1, "/images/brick/Brick9.png", gamePane);
     }
 
     @Override

@@ -3,11 +3,16 @@ package gameobject.dynamic;
 import application.GameManager;
 import gameobject.bricks.NormalBrick;
 import gameobject.core.MovableObject;
+import application.Config;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.animation.AnimationTimer;
 import java.util.Random;
+import gameobject.core.Brick;
+import gameobject.core.GameObject;
+import gameobject.dynamic.Paddle;
+import gameobject.bricks.*;
 
 /**
  * Boss - kẻ địch cuối cùng, có nhiều máu và kỹ năng đặc biệt
@@ -20,6 +25,9 @@ public class Boss extends MovableObject {
     private Random random;
     private AnimationTimer attackTimer;
     private boolean isAlive = true;
+    private boolean isInvincible = false; // Trạng thái bất tử
+    private static final double INVINCIBILITY_DURATION_MS = 200; // 0.2 giây
+    private static final char[] BRICK_TYPES = {'N', 'S', 'T', 'H', 'Q', 'D', 'B'};
 
     // Kỹ năng của boss
     private boolean canSpawnBricks = true;
@@ -28,11 +36,11 @@ public class Boss extends MovableObject {
     private static final long ATTACK_COOLDOWN = 2000; // 2 giây giữa các đợt tấn công
 
     public Boss(Pane gameRoot, double sceneWidth, double sceneHeight) {
-        super(sceneWidth / 2 - 75, 50, 150, 80,
+        super(sceneWidth / 2 - 75, 20, 200, 152,
                 new Image(Boss.class.getResourceAsStream("/images/npc/Boss.png")));
         this.gameRoot = gameRoot;
         this.random = new Random();
-        this.maxHealth = 10; // Boss có 10 máu
+        this.maxHealth = 20; // Boss có 20 máu
         this.health = maxHealth;
 
         // Tạo ImageView
@@ -45,7 +53,7 @@ public class Boss extends MovableObject {
         gameRoot.getChildren().add(imageView);
 
         // Di chuyển ngang qua lại
-        setDx(2);
+        setDx(120.0);
 
         // Bắt đầu tấn công
         startAttacking();
@@ -55,16 +63,25 @@ public class Boss extends MovableObject {
     public void update(double deltaTime) {
         if (!isAlive) return;
 
-        // Di chuyển boss
-        setX(getX() + getDx() * deltaTime);
+        // 1. Tính toán vị trí X mới
+        double newX = getX() + getDx() * deltaTime;
 
-        // Đổi hướng khi chạm biên
-        if (getX() <= 0 || getX() + getWidth() >= gameRoot.getWidth()) {
-            setDx(-getDx());
+        // 2. Kiểm tra va chạm biên VÀ "KẸP" VỊ TRÍ
+        if (newX <= 0) {
+            // Va chạm trái
+            newX = 0; // KẸP lại ở vị trí 0
+            setDx(-getDx()); // Đảo hướng
+        } else if (newX + getWidth() >= gameRoot.getWidth()) {
+            // Va chạm phải
+            newX = gameRoot.getWidth() - getWidth(); // KẸP lại ở mép phải
+            setDx(-getDx()); // Đảo hướng
         }
 
-        // Cập nhật ImageView
+        // 3. Cập nhật vị trí X (và ImageView)
+        setX(newX); // Dùng newX đã được "kẹp"
         imageView.setLayoutX(getX());
+
+        // 4. Cập nhật Y (chỉ để cho ImageView, vì Boss không di chuyển dọc)
         imageView.setLayoutY(getY());
     }
 
@@ -113,16 +130,66 @@ public class Boss extends MovableObject {
      * Boss sinh ra gạch khi máu thấp
      */
     private void spawnBricks() {
-        if ((double)health / maxHealth > 0.3) return;
-        System.out.println("Boss spawning bricks!");
-        int brickCount = 3 + random.nextInt(3);
+        // 1. XÓA BỎ KIỂM TRA MÁU
+        // (Dòng code cũ "if ((double)health / maxHealth > 0.3) return;" đã bị xóa)
+
+        System.out.println("Boss spawning random bricks!");
+
+        // 2. TÌM PADDLE
+        // Chúng ta cần 'paddle' để có thể tạo ra các loại gạch rơi item
+        GameManager gm = GameManager.getInstance();
+        Paddle paddle = null;
+        for (GameObject obj : gm.getGameObjects()) {
+            if (obj instanceof Paddle) {
+                paddle = (Paddle) obj;
+                break;
+            }
+        }
+
+        // Nếu vì lý do nào đó không tìm thấy paddle, hủy kỹ năng
+        if (paddle == null) {
+            System.err.println("Boss không tìm thấy Paddle, không thể tạo gạch item.");
+            return;
+        }
+
+        // 3. TẠO GẠCH NGẪU NHIÊN
+        int brickCount = 3 + random.nextInt(3); // Tạo từ 3 đến 5 viên
         for (int i = 0; i < brickCount; i++) {
-            double brickX = random.nextDouble() * (gameRoot.getWidth() - 50);
+
+            // 3a. Lấy vị trí ngẫu nhiên
+            double brickX = random.nextDouble() * (gameRoot.getWidth() - Config.BRICK_WIDTH);
             double brickY = getY() + getHeight() + 20 + random.nextDouble() * 100;
-            NormalBrick brick = new NormalBrick(brickX, brickY, gameRoot);
-            GameManager.getInstance().addGameObject(brick); // THÊM VÀO GAME
+
+            // 3b. Lấy loại gạch ngẫu nhiên
+            char brickType = BRICK_TYPES[random.nextInt(BRICK_TYPES.length)];
+
+            // 3c. Tạo gạch (Dùng logic giống như BrickMapLoader)
+            Brick brick = null;
+            switch (brickType) {
+                case 'N':
+                    brick = new NormalBrick(brickX, brickY, gameRoot);
+                    break;
+                case 'S':
+                    brick = new StrongBrick(brickX, brickY, gameRoot, paddle);
+                    break;
+                case 'D':
+                    brick = new DoubleBallBrick(brickX, brickY, gameRoot, paddle);
+                    break;
+                case 'H':
+                    brick = new HeartBrick(brickX, brickY, gameRoot, paddle);
+                    break;
+                case 'T': // Gạch 3 máu (hoặc 2 máu) của bạn
+                    brick = new ToughBrick(brickX, brickY, gameRoot);
+                    break;
+            }
+
+            // 3d. Thêm gạch vào game
+            if (brick != null) {
+                gm.addGameObject(brick);
+            }
         }
     }
+
 
     /**
      * Boss bắn đạn
@@ -130,15 +197,17 @@ public class Boss extends MovableObject {
     private void shootProjectile() {
         System.out.println("💥 Boss shooting projectile!");
 
-        // Tạo đạn từ vị trí boss
-        double projectileX = getX() + getWidth() / 2 - 10;
+        // 1. Tính toán vị trí đạn (ở giữa, bên dưới Boss)
+        double projectileX = getX() + (getWidth() / 2) - 7.5; // (7.5 là một nửa chiều rộng đạn)
         double projectileY = getY() + getHeight();
 
-        // Có thể tạo class BossProjectile
-        // BossProjectile projectile = new BossProjectile(gameRoot, projectileX, projectileY);
-        // projectile.setDy(4); // Rơi xuống
-    }
+        // 2. Tạo đối tượng đạn mới
+        BossProjectile projectile = new BossProjectile(this.gameRoot, projectileX, projectileY);
 
+        // 3. THÊM ĐẠN VÀO GAME
+        // (Đây là bước quan trọng nhất)
+        GameManager.getInstance().addGameObject(projectile);
+    }
     /**
      * Boss di chuyển nhanh
      */
@@ -159,11 +228,18 @@ public class Boss extends MovableObject {
      * Boss nhận sát thương
      */
     public void takeDamage(int damage) {
-        if (!isAlive) return;
+        // 1. KIỂM TRA BẤT TỬ:
+        // Nếu Boss đang bất tử (vừa bị đánh) hoặc đã chết, không làm gì cả.
+        if (isInvincible || !isAlive) return;
 
+        // 2. KÍCH HOẠT BẤT TỬ
+        // (Ngăn chặn các cú đánh ở frame tiếp theo)
+        this.isInvincible = true;
+
+        // 3. Trừ máu (Code cũ của bạn)
         health -= damage;
 
-        // Hiệu ứng khi bị đánh
+        // 4. Hiệu ứng flash (Code cũ của bạn)
         imageView.setOpacity(0.5);
         javafx.animation.PauseTransition flash =
                 new javafx.animation.PauseTransition(javafx.util.Duration.millis(100));
@@ -172,9 +248,17 @@ public class Boss extends MovableObject {
 
         System.out.println("💢 Boss took " + damage + " damage! Health: " + health + "/" + maxHealth);
 
+        // 5. Kiểm tra chết (Code cũ của bạn)
         if (health <= 0) {
             die();
         }
+
+        // 6. BỘ ĐẾM GIỜ HỒI PHỤC
+        // Tạo một bộ đếm giờ để TẮT bất tử sau 0.2 giây
+        javafx.animation.PauseTransition cooldown =
+                new javafx.animation.PauseTransition(javafx.util.Duration.millis(INVINCIBILITY_DURATION_MS));
+        cooldown.setOnFinished(e -> this.isInvincible = false); // Tắt bất tử
+        cooldown.play();
     }
 
     /**
