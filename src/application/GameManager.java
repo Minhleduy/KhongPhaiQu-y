@@ -202,10 +202,9 @@ public void startBossFight() {
     Ball bossBall = new Ball(this.gamePane, ballStartX, ballStartY, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
     addGameObject(bossBall);
 
-    // 7. Cập nhật Hình nền
-    int bossLevelID = 5; // (ID cho hình nền boss)
+//    int bossLevelID = 5; // (ID cho hình nền boss)
     if (backgroundManager != null) {
-        backgroundManager.setBackgroundForLevel(bossLevelID);
+        backgroundManager.setBackgroundForLevel(5);
     }
 
     // Cập nhật thanh máu Boss lần đầu

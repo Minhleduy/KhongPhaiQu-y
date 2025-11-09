@@ -7,12 +7,13 @@ public class Level1 {
      */
     public static String[] getMap() {
         return new String[]{
-                //"NNNNNQNNNNNSNSNSNNNNN",
-                //" N S S N D N H S S N ",
-                //"   N S N N Q N S N   ",
-                //"     N H S S N N     ",
-                //"   USSDDDTHTUBBBTTT  "
-                "          NNN        "
+//                "                    ",
+//                "    NNNNNNNNNNNN    ",
+//                "   NNNNNNNNNNNNNN   ",
+//                "  NN H NNNNNN H NN  ",
+//                "  NN N S NNNN S N NN  ",
+//                " NNNNNNNNNNNNNNNNNN "
+                " N "
         };
     }
 }

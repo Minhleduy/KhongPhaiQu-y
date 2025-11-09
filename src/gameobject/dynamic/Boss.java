@@ -248,13 +248,10 @@ public class Boss extends MovableObject {
 
         System.out.println("💢 Boss took " + damage + " damage! Health: " + health + "/" + maxHealth);
 
-        // 5. Kiểm tra chết (Code cũ của bạn)
         if (health <= 0) {
             die();
         }
 
-        // 6. BỘ ĐẾM GIỜ HỒI PHỤC
-        // Tạo một bộ đếm giờ để TẮT bất tử sau 0.2 giây
         javafx.animation.PauseTransition cooldown =
                 new javafx.animation.PauseTransition(javafx.util.Duration.millis(INVINCIBILITY_DURATION_MS));
         cooldown.setOnFinished(e -> this.isInvincible = false); // Tắt bất tử
@@ -276,7 +273,6 @@ public class Boss extends MovableObject {
         // Có thể thêm animation nổ, hiệu ứng particles, v.v.
     }
 
-    // ======== GETTERS ========
     public int getHealth() {
         return health;
     }
