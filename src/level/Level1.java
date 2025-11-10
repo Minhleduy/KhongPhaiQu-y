@@ -12,7 +12,7 @@ public class Level1 {
                 //"   N S N N Q N S N   ",
                 //"     N H S S N N     ",
                 //"   USSDDDTHTUBBBTTT  "
-                "          NNN        "
+                "          N          "
         };
     }
 }

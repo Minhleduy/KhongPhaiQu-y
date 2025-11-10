@@ -14,7 +14,7 @@ public class FinalLevel {
                 //"S N Q U U U U Q N S",
                 //"U S N N N N N N S U",
                 //"U U S S S S S S U U"
-                "          NNN        "
+                "          N          "
         };
     }
 }

@@ -26,7 +26,7 @@ public class Boss extends MovableObject {
     private AnimationTimer attackTimer;
     private boolean isAlive = true;
     private boolean isInvincible = false; // Trạng thái bất tử
-    private static final double INVINCIBILITY_DURATION_MS = 200; // 0.2 giây
+    private static final double INVINCIBILITY_DURATION_MS = 500; // 0.2 giây
     private static final char[] BRICK_TYPES = {'N', 'S', 'T', 'H', 'Q', 'D', 'B'};
 
     // Kỹ năng của boss
@@ -36,11 +36,11 @@ public class Boss extends MovableObject {
     private static final long ATTACK_COOLDOWN = 2000; // 2 giây giữa các đợt tấn công
 
     public Boss(Pane gameRoot, double sceneWidth, double sceneHeight) {
-        super(sceneWidth / 2 - 75, 20, 200, 152,
-                new Image(Boss.class.getResourceAsStream("/images/npc/Boss.png")));
+        super(sceneWidth / 2 - 10, 0, 250, 250,
+                new Image(Boss.class.getResourceAsStream("/images/npc/Boss1.png")));
         this.gameRoot = gameRoot;
         this.random = new Random();
-        this.maxHealth = 20; // Boss có 20 máu
+        this.maxHealth = 25;
         this.health = maxHealth;
 
         // Tạo ImageView
@@ -56,56 +56,62 @@ public class Boss extends MovableObject {
         setDx(120.0);
 
         // Bắt đầu tấn công
-        startAttacking();
+        //startAttacking();
     }
 
     @Override
     public void update(double deltaTime) {
         if (!isAlive) return;
 
-        // 1. Tính toán vị trí X mới
+        // --- PHẦN 1: LOGIC DI CHUYỂN (Code cũ của bạn, đã đúng) ---
         double newX = getX() + getDx() * deltaTime;
-
-        // 2. Kiểm tra va chạm biên VÀ "KẸP" VỊ TRÍ
         if (newX <= 0) {
-            // Va chạm trái
-            newX = 0; // KẸP lại ở vị trí 0
-            setDx(-getDx()); // Đảo hướng
+            newX = 0;
+            setDx(-getDx());
         } else if (newX + getWidth() >= gameRoot.getWidth()) {
-            // Va chạm phải
-            newX = gameRoot.getWidth() - getWidth(); // KẸP lại ở mép phải
-            setDx(-getDx()); // Đảo hướng
+            newX = gameRoot.getWidth() - getWidth();
+            setDx(-getDx());
         }
-
-        // 3. Cập nhật vị trí X (và ImageView)
-        setX(newX); // Dùng newX đã được "kẹp"
+        setX(newX);
         imageView.setLayoutX(getX());
-
-        // 4. Cập nhật Y (chỉ để cho ImageView, vì Boss không di chuyển dọc)
         imageView.setLayoutY(getY());
+
+        // --- PHẦN 2: LOGIC TẤN CÔNG (MỚI) ---
+        // (Chuyển từ AnimationTimer vào đây)
+
+        // 1. Lấy thời gian hiện tại (tính bằng nano giây)
+        long now = System.nanoTime();
+
+        // 2. Kiểm tra thời gian hồi chiêu
+        // (LƯU Ý: ATTACK_COOLDOWN của bạn là mili giây, phải nhân 1_000_000)
+        if (now - lastAttackTime >= ATTACK_COOLDOWN * 1_000_000) {
+            performRandomAttack();
+            lastAttackTime = now; // Đặt lại mốc thời gian
+        }
     }
+
 
     /**
      * Bắt đầu các đợt tấn công của boss
      */
-    private void startAttacking() {
-        attackTimer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (!isAlive) {
-                    stop();
-                    return;
-                }
-
-                // Tấn công mỗi 2 giây
-                if (now - lastAttackTime >= ATTACK_COOLDOWN * 1_000_000) {
-                    performRandomAttack();
-                    lastAttackTime = now;
-                }
-            }
-        };
-        attackTimer.start();
-    }
+//    private void startAttacking() {
+//        attackTimer = new AnimationTimer() {
+//            @Override
+//            public void handle(long now) {
+//                if (!isAlive) {
+//                    stop();
+//                    return;
+//                }
+//
+//                // Tấn công mỗi 2 giây
+//                if (now - lastAttackTime >= ATTACK_COOLDOWN * 1_000_000) {
+//                    performRandomAttack();
+//                    lastAttackTime = now;
+//                }
+//            }
+//        };
+//        attackTimer.start();
+//    }
 
     /**
      Thực hiện tấn công ngẫu nhiên

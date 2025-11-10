@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
+import utils.SoundManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -133,7 +134,7 @@ public class Ball extends MovableObject {
 
                 // --- Toàn bộ logic va chạm Boss được chuyển vào đây ---
                 boss.takeDamage(1);
-
+                //SoundManager.getInstance().playSoundEffect("/sounds/hit.mp3");
                 if (gm.getGameUIController() != null) {
                     gm.getGameUIController().updateBossHealth(boss.getHealth(), boss.getMaxHealth());
                 }
@@ -214,6 +215,7 @@ public class Ball extends MovableObject {
                 } else {
                     bounceFromBrick(brick);
                 }
+                SoundManager.getInstance().playSoundEffect("/sounds/hit.mp3");
                 break;
             }
         }
@@ -221,17 +223,15 @@ public class Ball extends MovableObject {
 
 
     private void bounceFromBrick(Brick brick) {
-        // Lấy tâm và kích thước
+        // ... (phần tính toán dxDiff, dyDiff, overlapX, overlapY giữ nguyên) ...
         double ballCenterX = getX() + getWidth() / 2;
         double ballCenterY = getY() + getHeight() / 2;
         double brickCenterX = brick.getX() + brick.getWidth() / 2;
         double brickCenterY = brick.getY() + brick.getHeight() / 2;
 
-        // Tính toán độ chênh lệch
         double dxDiff = ballCenterX - brickCenterX;
         double dyDiff = ballCenterY - brickCenterY;
 
-        // Tính toán độ "chồng lấn" (overlap)
         double overlapX = (getWidth() / 2 + brick.getWidth() / 2) - Math.abs(dxDiff);
         double overlapY = (getHeight() / 2 + brick.getHeight() / 2) - Math.abs(dyDiff);
 
@@ -242,12 +242,14 @@ public class Ball extends MovableObject {
             // 1. Đảo ngược vận tốc X
             setDx(-getDx());
 
-            // 2. ĐẨY BÓNG RA (Push-out) - SỬA LỖI
+            // 2. ĐẨY BÓNG RA (Push-out) - LOGIC ĐÃ SỬA
             if (dxDiff > 0) {
-                // Va chạm bên TRÁI GẠCH -> Đẩy bóng sang PHẢI
+                // Ball ở bên PHẢI tâm gạch (va chạm mặt TRÁI)
+                // -> Đẩy bóng sang PHẢI (ra xa)
                 setX(brick.getX() + brick.getWidth() + 1);
             } else {
-                // Va chạm bên PHẢI GẠCH -> Đẩy bóng sang TRÁI
+                // Ball ở bên TRÁI tâm gạch (va chạm mặt PHẢI)
+                // -> Đẩy bóng sang TRÁI (ra xa)
                 setX(brick.getX() - getWidth() - 1);
             }
 
@@ -257,16 +259,20 @@ public class Ball extends MovableObject {
             // 1. Đảo ngược vận tốc Y
             setDy(-getDy());
 
-            // 2. ĐẨY BÓNG RA (Push-out) - SỬA LỖI
+            // 2. ĐẨY BÓNG RA (Push-out) - LOGIC ĐÃ SỬA
             if (dyDiff > 0) {
-                // Va chạm MẶT TRÊN của GẠCH -> Đẩy bóng XUỐNG DƯỚI
+                // Ball ở BÊN DƯỚI tâm gạch (va chạm mặt TRÊN)
+                // -> Đẩy bóng XUỐNG DƯỚI (ra xa)
                 setY(brick.getY() + brick.getHeight() + 1);
             } else {
-                // Va chạm MẶT DƯỚI của GẠCH -> Đẩy bóng LÊN TRÊN
+                // Ball ở BÊN TRÊN tâm gạch (va chạm mặt DƯỚI)
+                // -> Đẩy bóng LÊN TRÊN (ra xa)
                 setY(brick.getY() - getHeight() - 1);
             }
         }
     }
+
+
 
 
 
@@ -368,17 +374,15 @@ public class Ball extends MovableObject {
         }
     }
     public void bounceFromBoss(Boss boss) {
-        // Lấy tâm và kích thước
+        // ... (phần tính toán dxDiff, dyDiff, overlapX, overlapY giữ nguyên) ...
         double ballCenterX = getX() + getWidth() / 2;
         double ballCenterY = getY() + getHeight() / 2;
         double bossCenterX = boss.getX() + boss.getWidth() / 2;
         double bossCenterY = boss.getY() + boss.getHeight() / 2;
 
-        // Tính toán độ chênh lệch
         double dxDiff = ballCenterX - bossCenterX;
         double dyDiff = ballCenterY - bossCenterY;
 
-        // Tính toán độ "chồng lấn" (overlap)
         double overlapX = (getWidth() / 2 + boss.getWidth() / 2) - Math.abs(dxDiff);
         double overlapY = (getHeight() / 2 + boss.getHeight() / 2) - Math.abs(dyDiff);
 
@@ -389,13 +393,13 @@ public class Ball extends MovableObject {
             // 1. Đảo ngược vận tốc X
             setDx(-getDx());
 
-            // 2. ĐẨY BÓNG RA (Push-out)
+            // 2. ĐẨY BÓNG RA (Push-out) - LOGIC ĐÃ SỬA
             if (dxDiff > 0) {
-                // Va chạm bên TRÁI Boss -> Đẩy bóng sang PHẢI
-                setX(boss.getX() + boss.getWidth() + 1);
+                // Ball ở bên PHẢI tâm Boss -> Đẩy bóng sang PHẢI (ra xa)
+                setX(boss.getX() + boss.getWidth() + 2);
             } else {
-                // Va chạm bên PHẢI Boss -> Đẩy bóng sang TRÁI
-                setX(boss.getX() - getWidth() - 1);
+                // Ball ở bên TRÁI tâm Boss -> Đẩy bóng sang TRÁI (ra xa)
+                setX(boss.getX() - getWidth() - 2);
             }
 
         } else {
@@ -404,15 +408,16 @@ public class Ball extends MovableObject {
             // 1. Đảo ngược vận tốc Y
             setDy(-getDy());
 
-            // 2. ĐẨY BÓNG RA (Push-out)
+            // 2. ĐẨY BÓNG RA (Push-out) - LOGIC ĐÃ SỬA
             if (dyDiff > 0) {
-                // Va chạm MẶT TRÊN của Boss -> Đẩy bóng XUỐNG DƯỚI
-                setY(boss.getY() + boss.getHeight() + 1);
+                // Ball ở BÊN DƯỚI tâm Boss -> Đẩy bóng XUỐNG DƯỚI (ra xa)
+                setY(boss.getY() + boss.getHeight() + 2);
             } else {
-                // Va chạm MẶT DƯỚI của Boss -> Đẩy bóng LÊN TRÊN
-                setY(boss.getY() - getHeight() - 1);
+                // Ball ở BÊN TRÊN tâm Boss -> Đẩy bóng LÊN TRÊN (ra xa)
+                setY(boss.getY() - getHeight() - 2);
             }
-
         }
     }
+
+
 }

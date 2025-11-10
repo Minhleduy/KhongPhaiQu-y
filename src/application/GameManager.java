@@ -2,7 +2,7 @@ package application;
 
 import javafx.scene.image.ImageView;
 import Arkanoid.ui.GameUIController;
-import Arkanoid.util.BackgroundManager;
+import utils.BackgroundManager;
 import Arkanoid.util.SoundManager;
 import gameobject.core.Brick;
 import gameobject.core.GameObject;
@@ -12,6 +12,7 @@ import gameobject.dynamic.Paddle;
 import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameManager {
     private static GameManager instance;
@@ -61,19 +62,22 @@ public class GameManager {
     }
 
     public void update(double deltaTime) {
-        // Khối 1: Cập nhật TẤT CẢ đối tượng
+        // Khối 1: Cập nhật TẤT CẢ đối tượng (Game logic)
         if (currentState == GameState.PLAYING || currentState == GameState.BOSS_FIGHT) {
+            // Tạo một bản sao của danh sách để tránh lỗi ConcurrentModificationException
             for (GameObject obj : new ArrayList<>(gameObjects)) {
-                obj.update(deltaTime); // <-- Ball.update() sẽ tự lo toàn bộ va chạm
+                obj.update(deltaTime); // Ball.update() sẽ tự lo toàn bộ va chạm
             }
+            // Kiểm tra xem level (không phải boss) đã hoàn thành chưa
             if (currentState == GameState.PLAYING && isLevelComplete()) {
+                utils.SoundManager.getInstance().playSoundEffect("/sounds/levelup.mp3");
                 LevelManager.getInstance().progressToNextStage();
             }
         }
 
-        // Khối 2: CHỈ kiểm tra điều kiện thắng
+        // Khối 2: CHỈ kiểm tra điều kiện thắng Boss
         if (currentState == GameState.BOSS_FIGHT) {
-            // Logic va chạm đã được chuyển vào Ball.java
+            // Logic va chạm đã được chuyển HẾT vào Ball.java
 
             // CHỈ GIỮ LẠI logic kiểm tra chiến thắng
             if (boss != null && !boss.isAlive()) {
@@ -83,6 +87,7 @@ public class GameManager {
             }
         }
     }
+
 
 
 
@@ -166,11 +171,18 @@ public class GameManager {
 
 
     private boolean isLevelComplete() {
-        return gameObjects.stream()
+        List<Brick> allBricks = gameObjects.stream()
                 .filter(obj -> obj instanceof Brick)
                 .map(obj -> (Brick) obj)
+                .collect(Collectors.toList());
+
+        if (allBricks.isEmpty()) {
+            return false;
+        }
+        return allBricks.stream()
                 .noneMatch(brick -> brick.isBreakable() && !brick.isDestroyed());
     }
+
 
 public void startBossFight() {
     setCurrentState(GameState.BOSS_FIGHT);

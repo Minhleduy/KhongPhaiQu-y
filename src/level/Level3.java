@@ -13,7 +13,7 @@ public class Level3 {
                 //" S N S N S N S N S N ",
                 //"   N N N N N N N N   ",
                 //"     S S Q Q S S     "
-                "          NNN        "
+                "          N          "
         };
     }
 }
