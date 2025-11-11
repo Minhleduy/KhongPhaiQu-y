@@ -1,12 +1,11 @@
 package application;
 
-import javafx.animation.AnimationTimer; // ✅ IMPORT
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    // ✅ Thêm biến Game Loop
     private AnimationTimer gameLoop;
 
     @Override
@@ -20,8 +19,6 @@ public class Main extends Application {
 
             sceneManager.showMainMenuScene();
             primaryStage.show();
-
-            // ✅ BẮT ĐẦU GAME LOOP
             startGameLoop();
 
         } catch (Exception e) {
@@ -29,11 +26,6 @@ public class Main extends Application {
         }
     }
 
-    /**
-     * ✅ THÊM HÀM NÀY
-     * Tạo và bắt đầu Vòng Lặp Game.
-     * Nó sẽ chạy 60 lần/giây và gọi GameManager.update().
-     */
     private void startGameLoop() {
         gameLoop = new AnimationTimer() {
             private long lastUpdate = 0;
@@ -43,13 +35,10 @@ public class Main extends Application {
                     double deltaTime = (now - lastUpdate) / 1_000_000_000.0; // giây
                     lastUpdate = now;
 
-                // QUAN TRỌNG: Giới hạn deltaTime.
-                // Nếu game bị treo 1 giây, bóng không nên bay xuyên tường.
                 if (deltaTime > 0.032) { // Giới hạn ở ~30 FPS
                     deltaTime = 0.032;
                 }
 
-                // SỬA LẠI: Truyền deltaTime vào GameManager
                 GameManager.getInstance().update(deltaTime);
 }
         };

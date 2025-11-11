@@ -1,7 +1,7 @@
 package application;
 
 import Arkanoid.ui.GameUIController;
-import Arkanoid.util.BackgroundManager;
+import utils.BackgroundManager;
 import gameobject.core.Brick;
 import gameobject.dynamic.Ball;
 import gameobject.dynamic.Paddle;
@@ -27,9 +27,6 @@ public class LevelManager {
         return instance;
     }
 
-    /**
-     * Tải một màn chơi thông thường với các viên gạch.
-     */
     public void loadLevel(int levelNumber) {
         this.currentLevel = levelNumber;
         GameManager gm = GameManager.getInstance();
@@ -48,6 +45,7 @@ public class LevelManager {
 
         List<Brick> bricks = BrickMapLoader.load(levelNumber, gameRoot, paddle);
         bricks.forEach(gm::addGameObject);
+
         if (gm.getGameUIController() != null) {
             gm.getGameUIController().updateLevel(levelNumber);
         }
@@ -55,7 +53,19 @@ public class LevelManager {
             gm.getBackgroundManager().setBackgroundForLevel(levelNumber);
         }
 
-        StoryManager.getInstance().showStoryForLevel(levelNumber);
+        String story = StoryManager.getInstance().getStoryForLevel(levelNumber);
+        if (story != null) {
+            // 1. Khóa game
+            GameManager.IS_GAME_PAUSED_FOR_STORY = true;
+
+            // 2. Hiển thị dialog
+            SceneManager sm = SceneManager.getInstance();
+
+            sm.getStoryDialogController().showDialogue(story);
+
+            sm.getStoryDialogRoot().setVisible(true);
+            sm.getStoryDialogRoot().setMouseTransparent(false);
+        }
     }
 
     /**
@@ -64,9 +74,21 @@ public class LevelManager {
     public void progressToNextStage() {
         if (currentLevel == MAX_REGULAR_LEVELS) {
             System.out.println("Đã hoàn thành màn 4! Chuẩn bị đấu Boss...");
+            String story = StoryManager.getInstance().getStoryForLevel(5); // Key 5 = Boss
+
+            GameManager.IS_GAME_PAUSED_FOR_STORY = true;
+
+            // 3. Hiển thị dialog
+            SceneManager sm = SceneManager.getInstance();
+
+            sm.getStoryDialogController().showDialogue(story); // Bỏ "null" đi
+
+            sm.getStoryDialogRoot().setVisible(true);
+            sm.getStoryDialogRoot().setMouseTransparent(false);
+
             GameManager.getInstance().startBossFight();
-        }
-        else if (currentLevel < MAX_REGULAR_LEVELS) {
+
+        } else if (currentLevel < MAX_REGULAR_LEVELS) {
             currentLevel++;
             loadLevel(currentLevel);
         }
@@ -83,6 +105,4 @@ public class LevelManager {
     public void setCurrentLevel(int currentLevel) {
         this.currentLevel = currentLevel;
     }
-
-
 }
