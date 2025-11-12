@@ -7,13 +7,18 @@ public class Level2 {
      */
     public static String[] getMap() {
         return new String[]{
-                //" S S S S Q S S S S S ",
-                //" S Q N N N N H Q N S ",
-                //" U U H S Q S S H U U ",
-                //" S N N N D N N D N S ",
-                //" S N N S S S S N N S ",
-                //"   U N N N N N N U   "
-                "          N          "
+                "                     ",
+                " N   N  T   T  N    N",
+                " NN NN  S   S  N   N ",
+                " N D N  T   T  N  N  ",
+                " N H N  T   T  N N   ",
+                " N   N  TSSST  DN    ",
+                " D   D  T   T  N N   ",
+                " N   N  T   T  N  N  ",
+                " N   N  S   S  N   N ",
+                " N   N  T   T  N    N",
+                " UUUUU  UUUUU  UUUUU ",
+                "          N          ",
         };
     }
 }
