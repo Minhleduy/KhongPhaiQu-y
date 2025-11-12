@@ -1,10 +1,10 @@
 ### 🎮 Game Arkanoid - Dự án Lập trình Hướng đối tượng (OOP)
 
 # 👨‍💻 Thành viên nhóm
-**Nhóm:** [Số nhóm] - **Lớp:** INT 2204 6 
-1. Lê Duy Minh - 24020231 - Đóng góp 33%
-2. Lê Văn Huy - 24020159 - Đóng góp 34%
-3. Trần Nam Khánh - 24020177 - Đóng góp 33%
+**Nhóm:** 12 - **Lớp:** INT 2204 6 
+1. Lê Duy Minh - 24020231
+2. Lê Văn Huy - 24020159
+3. Trần Nam Khánh - 24020177
 
 **Giảng viên hướng dẫn:** Kiều Văn Tuyên - Trương Xuân Hiếu
 **Học kỳ:** HK1 - Năm học 2025 - 2026
