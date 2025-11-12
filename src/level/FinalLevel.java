@@ -7,13 +7,23 @@ public class FinalLevel {
      */
     public static String[] getMap() {
         return new String[]{
-//                " UTUTUTUTUTUTUTUTUT ",
-//                " T N S N T T N S N T",
-//                " T N N N T T N N N T",
-//                " T T D T T T T D T T",
-//                "  UUUUU N H N UUUUU  ",
-//                "  T T T N Q N T T T  "
-                  " N "
+
+                "T     NNN   NNN     T",
+                "T        N N        T",
+                "T         N         T",
+                " T       NNN       T ",
+                "  T    NNNNNNN    T  ",
+                "   T  NNTTTTTNN  T   ",
+                "    TNTTTSDSTTTNT    ",
+                "    NTTNSNHNSNTTN    ",
+                "TTTTNTTDHDUSHDTTNTTTT",
+                "    NTTSSDDDSSTTN    ",
+                "   T NNNTTTTTNNN T  ",
+                "  T   NNNNNNNNN   T  ",
+                " T      NNNNN      T ",
+                "  T               T  ",
+                "   T             T   "
+
         };
     }
 }

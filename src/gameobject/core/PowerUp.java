@@ -5,11 +5,11 @@ import gameobject.dynamic.Paddle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import utils.SoundManager;
 
 public abstract class PowerUp extends MovableObject {
     protected Pane gameRoot;
     protected Paddle paddle;
-    //protected ImageView imageView;
 
     public PowerUp(Pane gameRoot, Paddle paddle, double x, double y, String imagePath) {
         super(x, y, 45, 45, new Image(PowerUp.class.getResourceAsStream(imagePath)));
@@ -25,7 +25,6 @@ public abstract class PowerUp extends MovableObject {
         imageView.setLayoutY(y);
         gameRoot.getChildren().add(this.imageView);
 
-        // THÊM VÀO GAMEMANAGER ĐỂ UPDATE
         GameManager.getInstance().addGameObject(this);
     }
 
@@ -40,6 +39,7 @@ public abstract class PowerUp extends MovableObject {
         }
 
         if (checkCollision()) {
+            utils.SoundManager.getInstance().playSoundEffect("/sounds/PickUp.mp3");
             applyEffect(paddle);
             remove();
         }

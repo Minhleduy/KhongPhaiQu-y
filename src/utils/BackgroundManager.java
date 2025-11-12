@@ -21,7 +21,8 @@ public class BackgroundManager {
             case 2 -> "/images/background/Background2.png";
             case 3 -> "/images/background/Background3.png";
             case 4 -> "/images/background/Background4.png";
-            case 5 -> "/images/background/BackgroundBoss.png";
+            case 5 -> "/images/background/Background5.png";
+         
             default -> "/images/background/Background1.png";
         };
         Image image = ImageLoader.loadImage(path);

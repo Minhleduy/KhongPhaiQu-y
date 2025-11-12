@@ -8,36 +8,31 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Arkanoid.ui.StoryDialogController">
+<AnchorPane fx:id="storyDialogRootPane" onMouseClicked="#handlePaneClicked" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Arkanoid.ui.StoryDialogController">
    <children>
-      <ImageView fitHeight="720.0" fitWidth="1280.0" layoutY="1.0">
+
+      <ImageView fx:id="npcImageView" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../images/npc/robotchat.png" />
-         </image>
-      </ImageView>
-      <Label fx:id="dialogueLabel" layoutX="337.0" layoutY="373.0" prefHeight="200.0" prefWidth="622.0" text="ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" textFill="#15f201" wrapText="true">
+            <Image url="@../images/npc/robot_dialog.png" />
+         </image></ImageView>
+
+      <Label fx:id="dialogueLabel" alignment="TOP_LEFT" layoutX="337.0" layoutY="376.0" prefHeight="194.0" prefWidth="622.0" text="Văn bản cốt truyện..." textFill="CYAN" wrapText="true">
          <font>
-            <Font size="23.0" />
+            <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Button fx:id="continueButton" layoutX="1096.0" layoutY="629.0" mnemonicParsing="false" onAction="#handleContinueAction" prefHeight="90.0" prefWidth="186.0" text="CONTINUE" textFill="#15f210">
+
+      <Button fx:id="continueButton" layoutX="1132.0" layoutY="656.0" mnemonicParsing="false" onAction="#handleContinueAction" prefHeight="40.0" prefWidth="148.0" text="Continue" textAlignment="CENTER">
          <font>
-            <Font size="27.0" />
-         </font>
-      </Button>
-      <HBox fx:id="choicesBox" layoutX="440.0" layoutY="523.0" prefHeight="100.0" prefWidth="414.0" visible="false">
+            <Font size="18.0" />
+         </font></Button>
+
+      <HBox fx:id="choicesBox" alignment="CENTER" layoutX="490.0" layoutY="579.0" prefHeight="40.0" prefWidth="300.0" spacing="20.0" visible="false">
          <children>
-            <Button fx:id="choiceAButton" mnemonicParsing="false" onAction="#handleChoiceAAction" prefHeight="98.0" prefWidth="214.0" text="True" textFill="#b9b418">
-               <font>
-                  <Font size="44.0" />
-               </font>
-            </Button>
-            <Button fx:id="choiceBButton" mnemonicParsing="false" onAction="#handleChoiceBAction" prefHeight="97.0" prefWidth="202.0" text="False" textFill="#b9b418">
-               <font>
-                  <Font size="44.0" />
-               </font>
-            </Button>
+            <Button fx:id="choiceAButton" mnemonicParsing="false" onAction="#handleChoiceAAction" prefHeight="30.0" prefWidth="130.0" text="Lựa chọn A" />
+            <Button fx:id="choiceBButton" mnemonicParsing="false" onAction="#handleChoiceBAction" prefHeight="30.0" prefWidth="130.0" text="Lựa chọn B" />
          </children>
       </HBox>
+
    </children>
 </AnchorPane>

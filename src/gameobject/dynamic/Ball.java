@@ -1,6 +1,5 @@
 package gameobject.dynamic;
 
-// ✅ CÁC IMPORT CẦN THIẾT
 import javafx.geometry.Rectangle2D;
 import application.Config;
 import application.GameManager;
@@ -12,12 +11,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
+import utils.SoundManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Ball extends MovableObject {
-    //private ImageView imageView;
     private final double BALL_SPEED = 400; // Tốc độ cơ bản
     private boolean isStrong = false;
     private PauseTransition strongModeTimer;
@@ -26,8 +25,8 @@ public class Ball extends MovableObject {
     private double originalWidth;
     private double originalHeight;
 
-    private static final double STRONG_MODE_SPEED_MODIFIER = 0.6; // Tốc độ giảm còn 60%
-    private static final double STRONG_MODE_SIZE_MODIFIER = 1.5;  // Kích thước tăng 150%
+    private static final double STRONG_MODE_SPEED_MODIFIER = 0.6;
+    private static final double STRONG_MODE_SIZE_MODIFIER = 1.5;
 
     public Ball(Pane gameRoot, double startX, double startY, double sceneWidth, double sceneHeight) {
 
@@ -42,16 +41,14 @@ public class Ball extends MovableObject {
         setWidth(image.getWidth());
         setHeight(image.getHeight());
 
-        resetVelocity(); // Đặt vận tốc ban đầu
+        resetVelocity();
 
         imageView.setLayoutX(startX);
         imageView.setLayoutY(startY);
         gameRoot.getChildren().add(this.imageView);
 
-        // startMoving(); // ⛔ LỖI 1: Đã xóa lệnh gọi Vòng Lặp Thừa
     }
 
-    // --- Getter & Setter (Sửa lại để dùng dx, dy) ---
     public ImageView getImageView() {
         return imageView;
     }
@@ -102,7 +99,6 @@ public class Ball extends MovableObject {
         setDx(-getDx());
     }
 
-    // ✅✅✅ LỖI 2: VIẾT LẠI HOÀN TOÀN HÀM UPDATE() ✅✅✅
     @Override
 
     public void update(double deltaTime) {
@@ -125,29 +121,23 @@ public class Ball extends MovableObject {
             }
         }
 
-        // 5. --- LOGIC MỚI: KIỂM TRA VA CHẠM BOSS ---
         // Chỉ chạy khi đang ở màn Boss
         if (gm.getGameState() == GameManager.GameState.BOSS_FIGHT) {
             Boss boss = gm.getBoss();
             if (boss != null && boss.isAlive() && boss.checkBallCollision(this)) {
 
-                // --- Toàn bộ logic va chạm Boss được chuyển vào đây ---
                 boss.takeDamage(1);
-
+                //SoundManager.getInstance().playSoundEffect("/sounds/hit.mp3");
                 if (gm.getGameUIController() != null) {
                     gm.getGameUIController().updateBossHealth(boss.getHealth(), boss.getMaxHealth());
                 }
 
-                bounceFromBoss(boss); // <-- Dùng hàm vật lý của Ball
-
-                // QUAN TRỌNG: Dừng update frame này tại đây
-                // để ngăn nó kiểm tra va chạm Gạch (sửa lỗi Race Condition)
+                bounceFromBoss(boss);
                 return;
             }
         }
 
         // 6. Kiểm tra va chạm Gạch (Bricks)
-        // (Chỉ chạy nếu KHÔNG va chạm với Boss ở trên)
         List<Brick> bricks = gameObjects.stream()
                 .filter(obj -> obj instanceof Brick)
                 .map(obj -> (Brick) obj)
@@ -159,34 +149,29 @@ public class Ball extends MovableObject {
 
 
     /**
-     * Hàm mới: Kiểm tra va chạm với 4 cạnh màn hình
+     * Kiểm tra va chạm với 4 cạnh màn hình
      */
     private void checkWallCollisions() {
-        // Va chạm biên trái / phải
         if (getX() <= 0) {
-            setDx(Math.abs(getDx())); // Luôn nảy về bên phải
+            setDx(Math.abs(getDx()));
             setX(0);
         }
         if (getX() + getWidth() >= sceneWidth) {
-            setDx(-Math.abs(getDx())); // Luôn nảy về bên trái
+            setDx(-Math.abs(getDx()));
             setX(sceneWidth - getWidth());
         }
-
-        // Va chạm biên trên
         if (getY() <= 0) {
-            setDy(Math.abs(getDy())); // Luôn nảy xuống
+            setDy(Math.abs(getDy()));
             setY(0);
         }
-
-        // Rơi ra ngoài biên dưới
         if (getY() > sceneHeight) {
             GameManager.getInstance().onBallFallen(this);
         }
     }
 
-    // --- Va chạm với paddle ---
     public void checkPaddleCollision(Paddle paddle) {
         if (getBounds().intersects(paddle.getBounds())) {
+            utils.SoundManager.getInstance().playSoundEffect("/sounds/TouchPaddle.mp3");
             setDy(-Math.abs(Config.BALL_SPEED_Y));
             double hitPos = (getX() + getWidth() / 2) - (paddle.getX() + paddle.getWidth() / 2);
             double normalizedHitPos = hitPos / (paddle.getWidth() / 2);
@@ -198,14 +183,11 @@ public class Ball extends MovableObject {
         }
     }
 
-    // --- Va chạm với gạch ---
     public void checkBrickCollision(List<Brick> bricks, Pane gameRoot) {
         for (Brick brick : bricks) {
             if (getBounds().intersects(brick.getBounds())) {
                 if (!brick.isUnbreakable()) {
                     if (isStrong) {
-//                        brick.hitPoints = 0; // phá ngay
-//                        brick.destroy(gameRoot);
                         brick.instantDestroy(gameRoot);
                     } else {
                         brick.hit(gameRoot);
@@ -214,6 +196,7 @@ public class Ball extends MovableObject {
                 } else {
                     bounceFromBrick(brick);
                 }
+                SoundManager.getInstance().playSoundEffect("/sounds/TouchBrick.mp3");
                 break;
             }
         }
@@ -221,57 +204,36 @@ public class Ball extends MovableObject {
 
 
     private void bounceFromBrick(Brick brick) {
-        // Lấy tâm và kích thước
         double ballCenterX = getX() + getWidth() / 2;
         double ballCenterY = getY() + getHeight() / 2;
         double brickCenterX = brick.getX() + brick.getWidth() / 2;
         double brickCenterY = brick.getY() + brick.getHeight() / 2;
 
-        // Tính toán độ chênh lệch
         double dxDiff = ballCenterX - brickCenterX;
         double dyDiff = ballCenterY - brickCenterY;
 
-        // Tính toán độ "chồng lấn" (overlap)
         double overlapX = (getWidth() / 2 + brick.getWidth() / 2) - Math.abs(dxDiff);
         double overlapY = (getHeight() / 2 + brick.getHeight() / 2) - Math.abs(dyDiff);
 
-        // So sánh độ chồng lấn
         if (overlapX < overlapY) {
-            // --- VA CHẠM NGANG (TRÁI/PHẢI) ---
-
-            // 1. Đảo ngược vận tốc X
             setDx(-getDx());
 
-            // 2. ĐẨY BÓNG RA (Push-out) - SỬA LỖI
             if (dxDiff > 0) {
-                // Va chạm bên TRÁI GẠCH -> Đẩy bóng sang PHẢI
                 setX(brick.getX() + brick.getWidth() + 1);
             } else {
-                // Va chạm bên PHẢI GẠCH -> Đẩy bóng sang TRÁI
                 setX(brick.getX() - getWidth() - 1);
             }
 
         } else {
-            // --- VA CHẠM DỌC (TRÊN/DƯỚI) ---
-
-            // 1. Đảo ngược vận tốc Y
             setDy(-getDy());
-
-            // 2. ĐẨY BÓNG RA (Push-out) - SỬA LỖI
             if (dyDiff > 0) {
-                // Va chạm MẶT TRÊN của GẠCH -> Đẩy bóng XUỐNG DƯỚI
                 setY(brick.getY() + brick.getHeight() + 1);
             } else {
-                // Va chạm MẶT DƯỚI của GẠCH -> Đẩy bóng LÊN TRÊN
                 setY(brick.getY() - getHeight() - 1);
             }
         }
     }
 
-
-
-
-    // ⛔ Đã xóa hàm resetBall() (GameManager sẽ lo việc reset vị trí)
 
     public void setPosition(double x, double y) {
         setX(x);
@@ -283,46 +245,30 @@ public class Ball extends MovableObject {
         setDy(Config.BALL_SPEED_Y); // Bay lên trên
     }
 
-    // Hàm getBounds() để va chạm chính xác
-//    public javafx.geometry.Bounds getBounds() {
-//        return imageView.getBoundsInParent();
-//    }
-
-    // --- Các hàm Strong Mode (Giữ nguyên) ---
     public void activateStrongMode() {
         System.out.println("🔥 Chế độ bóng mạnh (Lớn & Chậm) đã được kích hoạt!");
 
-        // 1. Nếu bóng ĐÃ MẠNH RỒI -> chỉ cần reset thời gian
         if (isStrong) {
             if (strongModeTimer != null) {
                 strongModeTimer.stop();
                 strongModeTimer.play(); // Chạy lại 10 giây
             }
-            return; // Không cần áp dụng hiệu ứng nữa
+            return;
         }
-
-        // 2. Nếu bóng CHƯA MẠNH -> áp dụng hiệu ứng
         this.isStrong = true;
 
-        // 3. Lưu lại trạng thái gốc (CHỈ LƯU KÍCH THƯỚC)
-        this.originalWidth = getWidth();   // Kích thước logic
-        this.originalHeight = getHeight(); // Kích thước logic
-
-        // 4. Áp dụng hiệu ứng: Chậm hơn (Sửa lỗi)
-        // Lấy tốc độ HIỆN TẠI (getDx()) và nhân nhỏ lại
+        this.originalWidth = getWidth();
+        this.originalHeight = getHeight();
         setDx(getDx() * STRONG_MODE_SPEED_MODIFIER);
         setDy(getDy() * STRONG_MODE_SPEED_MODIFIER);
-
-        // 5. Áp dụng hiệu ứng: To ra (cả logic và hình ảnh)
         double newWidth = this.originalWidth * STRONG_MODE_SIZE_MODIFIER;
         double newHeight = this.originalHeight * STRONG_MODE_SIZE_MODIFIER;
 
-        super.setWidth(newWidth);   // Cập nhật kích thước logic
+        super.setWidth(newWidth);
         super.setHeight(newHeight);
-        this.imageView.setFitWidth(newWidth);   // Cập nhật kích thước hình ảnh
+        this.imageView.setFitWidth(newWidth);
         this.imageView.setFitHeight(newHeight);
 
-        // 6. Bắt đầu hẹn giờ (như cũ)
         if (strongModeTimer != null) {
             strongModeTimer.stop();
         }
@@ -332,25 +278,19 @@ public class Ball extends MovableObject {
     }
 
     private void deactivateStrongMode() {
-        System.out.println("💧 Chế độ bóng mạnh đã kết thúc.");
+        System.out.println(" Chế độ bóng mạnh đã kết thúc.");
         this.isStrong = false;
-
-        // --- SỬA LỖI KHÔI PHỤC HƯỚNG ---
-
-        // 1. Lấy tốc độ HIỆN TẠI (đang bị chậm)
         double currentDx = getDx();
         double currentDy = getDy();
 
-        // 2. Khôi phục tốc độ bình thường bằng cách chia cho hệ số giảm tốc
-        // (Đây là phép toán ngược của: getDx() * STRONG_MODE_SPEED_MODIFIER)
         double restoredDx = currentDx / STRONG_MODE_SPEED_MODIFIER;
         double restoredDy = currentDy / STRONG_MODE_SPEED_MODIFIER;
 
-        // 3. Đặt lại tốc độ (bây giờ đã trở lại bình thường và đúng hướng)
+
         setDx(restoredDx);
         setDy(restoredDy);
 
-        // 4. Khôi phục kích thước gốc (Phần này đã đúng)
+
         super.setWidth(this.originalWidth);
         super.setHeight(this.originalHeight);
         this.imageView.setFitWidth(this.originalWidth);
@@ -368,51 +308,37 @@ public class Ball extends MovableObject {
         }
     }
     public void bounceFromBoss(Boss boss) {
-        // Lấy tâm và kích thước
         double ballCenterX = getX() + getWidth() / 2;
         double ballCenterY = getY() + getHeight() / 2;
         double bossCenterX = boss.getX() + boss.getWidth() / 2;
         double bossCenterY = boss.getY() + boss.getHeight() / 2;
 
-        // Tính toán độ chênh lệch
         double dxDiff = ballCenterX - bossCenterX;
         double dyDiff = ballCenterY - bossCenterY;
 
-        // Tính toán độ "chồng lấn" (overlap)
         double overlapX = (getWidth() / 2 + boss.getWidth() / 2) - Math.abs(dxDiff);
         double overlapY = (getHeight() / 2 + boss.getHeight() / 2) - Math.abs(dyDiff);
 
-        // So sánh độ chồng lấn
         if (overlapX < overlapY) {
-            // --- VA CHẠM NGANG (TRÁI/PHẢI) ---
 
-            // 1. Đảo ngược vận tốc X
             setDx(-getDx());
 
-            // 2. ĐẨY BÓNG RA (Push-out)
             if (dxDiff > 0) {
-                // Va chạm bên TRÁI Boss -> Đẩy bóng sang PHẢI
-                setX(boss.getX() + boss.getWidth() + 1);
+                setX(boss.getX() + boss.getWidth() + 2);
             } else {
-                // Va chạm bên PHẢI Boss -> Đẩy bóng sang TRÁI
-                setX(boss.getX() - getWidth() - 1);
+                setX(boss.getX() - getWidth() - 2);
             }
 
         } else {
-            // --- VA CHẠM DỌC (TRÊN/DƯỚI) ---
-
-            // 1. Đảo ngược vận tốc Y
             setDy(-getDy());
 
-            // 2. ĐẨY BÓNG RA (Push-out)
             if (dyDiff > 0) {
-                // Va chạm MẶT TRÊN của Boss -> Đẩy bóng XUỐNG DƯỚI
-                setY(boss.getY() + boss.getHeight() + 1);
+                setY(boss.getY() + boss.getHeight() + 2);
             } else {
-                // Va chạm MẶT DƯỚI của Boss -> Đẩy bóng LÊN TRÊN
-                setY(boss.getY() - getHeight() - 1);
+                setY(boss.getY() - getHeight() - 2);
             }
-
         }
     }
+
+
 }

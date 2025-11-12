@@ -1,13 +1,14 @@
 package application;
 
-import Arkanoid.ui.GameUIController; // ✅ IMPORT CONTROLLER CỦA BẠN
+import Arkanoid.ui.GameUIController;
 import javafx.fxml.FXMLLoader;
 import utils.BackgroundManager;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane; // ✅ IMPORT PANE
-import javafx.scene.layout.StackPane; // ✅ IMPORT STACKPANE
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import Arkanoid.ui.StoryDialogController;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -18,11 +19,11 @@ public class SceneManager {
     private static SceneManager instance;
     private Stage primaryStage;
 
-    // ✅ THÊM CÁC BIẾN ĐỂ LƯU CÁC LỚP GAME
-    private Pane gamePane; // Lớp dưới (chứa nền, bóng, gạch)
-    private Parent gameUIRoot; // Lớp trên (HUD của bạn)
-    private GameUIController gameUIController; // Controller của HUD
-
+    private Pane gamePane;
+    private Parent gameUIRoot;
+    private GameUIController gameUIController;
+    private Parent storyDialogRoot;
+    private StoryDialogController storyDialogController;
     private SceneManager() {}
 
     public static synchronized SceneManager getInstance() {
@@ -56,42 +57,36 @@ public class SceneManager {
         switchScene("MainMenu.fxml");
     }
 
-    /**
-     * ✅ SỬA LẠI HÀM NÀY HOÀN TOÀN
-     * Tạo ra màn hình game bằng cách XẾP CHỒNG 2 LỚP:
-     * Lớp Dưới (gamePane) + Lớp Trên (gameUIRoot)
-     */
     public void showGameScene() {
         try {
-            // 1. Tạo Lớp Dưới (Lớp Gameplay)
-            // Đây là nơi GameManager sẽ vẽ nền, gạch, bóng...
             gamePane = new Pane();
             gamePane.setPrefSize(Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
 
-            // 2. Tải Lớp Trên (HUD của bạn) bằng FXMLLoader để lấy Controller
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/GameUI.fxml"));
             gameUIRoot = loader.load();
-
-            gameUIRoot.setMouseTransparent(true); // Làm cho HUD trong suốt với chuột
-
-            // 3. Lấy và lưu lại Controller của HUD
+            gameUIRoot.setMouseTransparent(true);
             gameUIController = loader.getController();
 
-            // 4. Tạo StackPane để xếp chồng
-            StackPane root = new StackPane();
-            root.getChildren().add(gamePane);     // Thêm Lớp Game (Dưới)
-            root.getChildren().add(gameUIRoot); // Thêm Lớp HUD (Trên)
+            FXMLLoader storyLoader = new FXMLLoader(getClass().getResource("/ui/StoryDialog.fxml"));
+            storyDialogRoot = storyLoader.load();
+            storyDialogController = storyLoader.getController();
+            storyDialogRoot.setVisible(false);
 
-            // 5. Tạo Scene mới và hiển thị
+            StackPane root = new StackPane();
+            root.getChildren().add(gamePane);
+            root.getChildren().add(gameUIRoot);
+            root.getChildren().add(storyDialogRoot);
+
             Scene scene = new Scene(root, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
             primaryStage.setScene(scene);
             root.requestFocus();
 
         } catch (IOException e) {
-            System.err.println("Không thể tải tệp FXML: GameUI.fxml");
+            System.err.println("Không thể tải tệp FXML!");
             e.printStackTrace();
         }
     }
+
 
     public void showGameOverScene(int finalScore) {
         System.out.println("Chuyển sang màn hình Game Over. Điểm cuối cùng: " + finalScore);
@@ -102,8 +97,6 @@ public class SceneManager {
         System.out.println("Đang chuyển sang màn hình chiến thắng...");
         switchScene("WinScreen.fxml");
     }
-
-    // ✅ THÊM CÁC HÀM GETTER ĐỂ GAMEMANAGER SỬ DỤNG
 
     /**
      * Trả về Pane của lớp game (lớp dưới)
@@ -120,4 +113,19 @@ public class SceneManager {
     public GameUIController getGameUIController() {
         return gameUIController;
     }
+
+    /**
+     * Trả về Controller của lớp Dialog (lớp trên cùng)
+     */
+    public StoryDialogController getStoryDialogController() {
+        return storyDialogController;
+    }
+
+    /**
+     * Trả về Giao diện (Root Node) của lớp Dialog
+     */
+    public Parent getStoryDialogRoot() {
+        return storyDialogRoot;
+    }
+
 }

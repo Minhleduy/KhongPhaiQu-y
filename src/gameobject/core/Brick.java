@@ -8,7 +8,6 @@ import javafx.scene.layout.Pane;
 public abstract class Brick extends GameObject {
     protected int hitPoints;        // Số lần cần trúng để vỡ
     protected boolean destroyed;    // Đã bị phá chưa?
-    //protected ImageView imageView;  //  ảnh của gạch
 
     public Brick(double x, double y, double width, double height, int hitPoints, String imagePath, Pane gamePane) {
         super(x, y, width, height);
@@ -65,9 +64,7 @@ public abstract class Brick extends GameObject {
     public boolean isBreakable() {
         return true;
     }
-//    public javafx.geometry.Bounds getBounds() {
-//        return imageView.getBoundsInParent(); // CHÍNH XÁC HƠN
-//    }
+
 
     public void update() {
         // Gạch không di chuyển
@@ -76,7 +73,7 @@ public abstract class Brick extends GameObject {
     public void instantDestroy(Pane gamePane) {
         if (destroyed || isUnbreakable()) return;
 
-        this.hitPoints = 1; // Đặt máu về 1
-        this.hit(gamePane); // Gọi hit() để máu trừ về 0 và kích hoạt mọi logic
+        this.hitPoints = 1;
+        this.hit(gamePane);
     }
 }

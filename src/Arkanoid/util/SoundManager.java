@@ -31,19 +31,12 @@ public class SoundManager {
         }
     }
 
-    /**
-     *GameManager sẽ gọi hàm này khi game bắt đầu.
-     */
     public void playMusic() {
         if (backgroundMusicPlayer != null) {
             backgroundMusicPlayer.play();
         }
     }
 
-    /**
-     * Dừng phát nhạc.
-     * GameManager sẽ gọi hàm này khi Game Over hoặc Win.
-     */
     public void stopMusic() {
         if (backgroundMusicPlayer != null) {
             backgroundMusicPlayer.stop();

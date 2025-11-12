@@ -6,10 +6,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 
-/**
- * Lớp cơ sở cho mọi vật thể trong game (gạch, bóng, paddle, item, v.v.)
- * Cung cấp vị trí, kích thước, hình ảnh và khung va chạm cơ bản.
- */
 public abstract class GameObject {
 
     protected double x;       // Tọa độ X
@@ -19,7 +15,6 @@ public abstract class GameObject {
     protected Image image;
     protected ImageView imageView;// Ảnh đại diện của vật thể
 
-    // ======== CONSTRUCTOR ========
     public GameObject(double x, double y, double width, double height) {
         this(x, y, width, height, null);
     }
@@ -32,7 +27,6 @@ public abstract class GameObject {
         this.image = image;
     }
 
-    // ======== GETTER / SETTER ========
 
     public double getX() {
         return x;
@@ -77,28 +71,22 @@ public abstract class GameObject {
         this.image = image;
     }
 
-    // ======== HÀM CHUNG ========
 
-    /** Vẽ vật thể lên màn hình (nếu có ảnh) */
     public void draw(GraphicsContext gc) {
         if (image != null) {
             gc.drawImage(image, x, y, width, height);
         }
     }
 
-    /** Trả về khung va chạm (collision bounds) */
     public javafx.geometry.Bounds getBounds() {
         if (this.imageView != null) {
             return this.imageView.getBoundsInParent();
         }
 
-        // Fallback nếu không có ảnh, dùng tọa độ x, y
-        // (Ít chính xác hơn cho va chạm)
         return new javafx.geometry.BoundingBox(this.x, this.y, this.width, this.height);
     }
 
-    /** Hàm cập nhật mỗi frame (override trong class con nếu cần) */
     public void update(double deltaTime) {
-        // Mặc định không làm gì
+
     }
 }
