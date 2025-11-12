@@ -17,6 +17,7 @@ public class Level1 {
                 "       NNDDNN       ",
                 "        NNNN        ",
                 "         NN         "
+ 
         };
     }
 }

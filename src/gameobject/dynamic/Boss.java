@@ -188,6 +188,7 @@ public class Boss extends MovableObject {
         if (health <= 0) {
             die();
         }
+
         javafx.animation.PauseTransition cooldown =
                 new javafx.animation.PauseTransition(javafx.util.Duration.millis(INVINCIBILITY_DURATION_MS));
         cooldown.setOnFinished(e -> this.isInvincible = false); // Tắt bất tử

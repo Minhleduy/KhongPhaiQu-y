@@ -36,7 +36,7 @@ public class GameUIController {
 
     public void updateLives(int lives) {
         if (livesContainer.getChildren().size() == lives) return;
-        livesContainer.getChildren().clear();
+            livesContainer.getChildren().clear();
         for (int i = 0; i < lives; i++) {
             ImageView heart = new ImageView(heartImage);
             heart.setFitWidth(35);

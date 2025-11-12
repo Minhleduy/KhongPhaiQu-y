@@ -186,9 +186,11 @@ public void startBossFight() {
     Ball bossBall = new Ball(this.gamePane, ballStartX, ballStartY, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
     addGameObject(bossBall);
 
+
     int bossLevelID = 5;
+
     if (backgroundManager != null) {
-        backgroundManager.setBackgroundForLevel(bossLevelID);
+        backgroundManager.setBackgroundForLevel(5);
     }
 
     if (gameUIController != null && boss != null) {

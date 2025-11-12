@@ -7,7 +7,6 @@ import java.util.Map;
 public class ImageLoader {
 
     private static final Map<String, Image> imageCache = new HashMap<>();
-
     public static Image loadImage(String path) {
         if (imageCache.containsKey(path)) {
             return imageCache.get(path);

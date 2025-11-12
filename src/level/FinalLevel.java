@@ -7,6 +7,7 @@ public class FinalLevel {
      */
     public static String[] getMap() {
         return new String[]{
+
                 "T     NNN   NNN     T",
                 "T        N N        T",
                 "T         N         T",
@@ -22,6 +23,7 @@ public class FinalLevel {
                 " T      NNNNN      T ",
                 "  T               T  ",
                 "   T             T   "
+
         };
     }
 }
