@@ -6,7 +6,9 @@
 2. Lê Văn Huy - 24020159
 3. Trần Nam Khánh - 24020177
 
+
 **Giảng viên hướng dẫn:** Kiều Văn Tuyên - Trương Xuân Hiếu
+
 **Học kỳ:** HK1 - Năm học 2025 - 2026
 
 ---
@@ -190,7 +192,7 @@ Trò chơi sử dụng nhiều luồng xử lý riêng biệt để tăng hiệu
 ---
 
 ### 🎬 Video minh họa (Video Demo)
-[![Video Demo](docs/screenshots/video-thumbnail.png)](docs/demo/gameplay.mp4)
+![Video Demo](resources\video/full_video.mp4)
 
 > 🎥 Toàn bộ video chơi thử được lưu tại thư mục: `docs/demo/gameplay.mp4`
 
