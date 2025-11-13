@@ -34,8 +34,7 @@ Dự án này được phát triển bằng **Java**, sử dụng các kỹ thu�
 3. Ứng dụng nhiều **Design Pattern** như:
    - Singleton
    - Factory Method
-   - Strategy
-   - Observer
+   - Template Method
    - State
 4. Sử dụng **đa luồng (Multithreading)** giúp trò chơi chạy mượt mà và giao diện phản hồi nhanh.
 5. Có **hiệu ứng âm thanh, hình ảnh động và vật phẩm tăng sức mạnh (Power-up)**.  
@@ -95,23 +94,23 @@ Biểu đồ tuần tự mô tả luồng hoạt động của một chức năn
 
 ## 🧠 Triển khai Design Pattern
 
-### 1. Singleton Pattern
+### 1. Singleton
 * **Được sử dụng trong:** `GameManager.java`, `LevelManager.java`, `SceneManager.java`, `SoundManager.java`
 * **Mục đích:** Đảm bảo chỉ tồn tại duy nhất một thể hiện (instance) của các lớp quản lý tài nguyên hoặc điều khiển trò chơi, giúp đồng bộ hóa dữ liệu trong toàn bộ ứng dụng.
 
-### 2. Factory Method Pattern
+### 2. Factory Method
 * **Được sử dụng trong:** `BrickMapLoader.java`
 * **Mục đích:** Cung cấp một phương thức (`load`) để "sản xuất" ra các đối tượng gạch (`Brick`) khác nhau. Nó đọc một ký tự (`'N'`, `'S'`, `'T'`, v.v.) từ bản đồ và trả về một thể hiện của lớp gạch tương ứng, che giấu logic tạo đối tượng phức tạp.
 
-### 3. Template Method Pattern
+### 3. Template Method
 * **Được sử dụng trong:** `GameObject.java`, `MovableObject.java`, `PowerUp.java`, `Brick.java` (và các lớp con của chúng).
 * **Mục đích:** Lớp cha (`PowerUp`) định nghĩa một "khuôn mẫu" cho một thuật toán (ví dụ: `startFalling`, `checkCollision`) và định nghĩa một bước trừu tượng (`abstract void applyEffect`). Các lớp con (`HeartItem`, `StrongBallItem`, v.v.) bắt buộc phải "điền vào" bước đó bằng cách cung cấp logic hiệu ứng của riêng mình.
 
-### 4. State Pattern
+### 4. State
 * **Được sử dụng trong:** `GameManager.java`
 * **Mục đích:** Cho phép `GameManager` thay đổi hành vi của nó một cách linh hoạt. Hành vi của phương thức `update()` thay đổi hoàn toàn dựa trên giá trị của biến trạng thái `currentState` (ví dụ: `GameState.PLAYING` sẽ kiểm tra gạch, trong khi `GameState.BOSS_FIGHT` sẽ kiểm tra va chạm với boss).
 
-### 5. фаса Facade Pattern
+### 5. фаса Facad
 * **Được sử dụng trong:** `SoundManager.java`, `BackgroundManager.java`, `ImageLoader.java`
 * **Mục đích:** Cung cấp một giao diện đơn giản (`playBackgroundMusic()`, `setBackgroundForLevel()`) để che giấu các logic phức tạp bên trong (quản lý `MediaPlayer`, tạo `BackgroundImage`, xử lý cache `HashMap`, v.v.), giúp các file controller gọn gàng hơn.
 
