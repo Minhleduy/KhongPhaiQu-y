@@ -151,20 +151,6 @@ Trò chơi sử dụng nhiều luồng xử lý riêng biệt để tăng hiệu
 5. **Tránh mất bóng:** Không để bóng rơi xuống dưới paddle, nếu không bạn sẽ mất một mạng.  
 6. **Hoàn thành màn chơi:** Phá hết các viên gạch có thể phá để qua màn tiếp theo, giết boss để thắng cuộc.
 
-### 💥 Hệ thống vật phẩm
-
-| Biểu tượng và Tên | Hiệu ứng |
-|-------------|------|-----------|
-|   | **Expand Paddle** | Tăng chiều rộng paddle trong 10 giây |
-| 🟥 | **Shrink Paddle** | Giảm chiều rộng paddle trong 10 giây |
-| ⚡ | **Fast Ball** | Tăng tốc độ bóng thêm 30% |
-| 🐌 | **Slow Ball** | Giảm tốc độ bóng 30% |
-| 🎯 | **Multi Ball** | Tạo thêm 2 quả bóng phụ |
-| 🔫 | **Laser Gun** | Cho phép bắn tia laser phá gạch trong 15 giây |
-| 🧲 | **Magnet** | Quả bóng dính vào paddle, nhấn SPACE để phóng |
-| 🛡️ | **Shield** | Tạo lớp chắn bảo vệ, ngăn mất 1 mạng |
-| 🔥 | **Fire Ball** | Quả bóng xuyên qua gạch trong 12 giây |
-
 ## 📸 Demo
 
 ### 📷 Ảnh minh họa
